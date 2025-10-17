@@ -1,7 +1,7 @@
 {
   "name": "TrancheMaster",
   "short_name": "TrancheMaster",
-  "description": "This simulator helps determine when it becomes more cost-effective to buy a property rather than continue renting.",
+  "description": "This simulator helps determine what threshold of tax you are depending on your income, and vice versa.",
   "scope": "/TrancheMaster/",
   "start_url": "/TrancheMaster/",
   "display": "standalone",

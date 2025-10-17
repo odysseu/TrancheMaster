@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +10,6 @@
     <link rel="stylesheet" href="style.css">
     <link id="favicon" rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
-
 <body>
     <header class="sticky-header">
         <div class="header-left">
@@ -29,7 +27,6 @@
             </label>
         </div>
     </header>
-
     <div class="container">
         <!-- Main mode menu -->
         <div class="menu">
@@ -43,7 +40,6 @@
                 <label for="revenu">Revenu (€) :</label>
                 <input type="number" id="revenu" placeholder="Entrez votre revenu">
             </div>
-
             <div class="input-group">
                 <label for="revenu-type">Type de revenu :</label>
                 <select id="revenu-type">
@@ -51,24 +47,33 @@
                     <option value="monthly">Mensuel</option>
                 </select>
             </div>
-
             <!-- Menu for 10% or charges -->
             <div class="menu">
-                <button id="abattement-btn" class="menu-btn active">Abattement 10%</button>
+                <button id="abattement-btn" class="menu-btn active">Abattement 10&nbsp;%</button>
                 <button id="fixed-charges-btn" class="menu-btn">Frais réels (€)</button>
             </div>
-
             <div class="input-group" id="fixed-charges-group" style="display: none;">
                 <label for="fixed-charges">Frais réels (€) :</label>
                 <input type="number" id="fixed-charges" placeholder="Entrez vos frais réels">
             </div>
-
             <button id="calculate-revenu-to-impot-btn" class="calculate-btn">Calculer</button>
-
             <div class="results">
                 <h2>Résultats</h2>
                 <p id="tax-percentage"></p>
-                <p id="money-per-threshold"></p>
+                <table class="threshold-table">
+                    <thead>
+                        <tr>
+                            <th>Tranche</th>
+                            <th>Montant imposable (€)</th>
+                            <th>Taux (%)</th>
+                            <th>Impôt (€)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="threshold-breakdown">
+                        <!-- Filled by JavaScript -->
+                    </tbody>
+                </table>
+                <p id="total-tax"></p>
                 <p id="missing-money"></p>
             </div>
         </div>
@@ -80,46 +85,37 @@
                 <button id="tax-percentage-btn" class="menu-btn active">Pourcentage d'imposition (%)</button>
                 <button id="tax-amount-btn" class="menu-btn">Montant de l'impôt (€)</button>
             </div>
-
             <div class="input-group" id="tax-percentage-group">
                 <label for="tax-percentage-input">Pourcentage d'imposition (%) :</label>
-                <input type="number" id="tax-percentage-input" placeholder="Entrez le pourcentage d'imposition">
+                <input type="number" id="tax-percentage-input" step="0.01" placeholder="Entrez le pourcentage d'imposition">
             </div>
-
-            <div class="input-group" id="tax-amount-group" style="display: none;">
+            <div class="input-group tax-type-group" id="tax-amount-group" style="display: none;">
                 <label for="tax-amount">Montant de l'impôt (€) :</label>
                 <input type="number" id="tax-amount" placeholder="Entrez le montant de l'impôt">
             </div>
-
-            <div class="input-group">
+            <div class="input-group tax-type-group" id="tax-type-group">
                 <label for="tax-type">Type de montant :</label>
                 <select id="tax-type">
                     <option value="yearly">Annuel</option>
                     <option value="monthly">Mensuel</option>
                 </select>
             </div>
-
             <!-- Menu for 10% or charges -->
             <div class="menu">
-                <button id="abattement-reverse-btn" class="menu-btn active">Abattement 10%</button>
+                <button id="abattement-reverse-btn" class="menu-btn active">Abattement 10&nbsp;%</button>
                 <button id="fixed-charges-reverse-btn" class="menu-btn">Frais réels (€)</button>
             </div>
-
             <div class="input-group" id="fixed-charges-group-reverse" style="display: none;">
                 <label for="fixed-charges-reverse">Frais réels (€) :</label>
                 <input type="number" id="fixed-charges-reverse" placeholder="Entrez vos frais réels">
             </div>
-
             <button id="calculate-impot-to-revenu-btn" class="calculate-btn">Calculer</button>
-
             <div class="results">
                 <h2>Résultats</h2>
                 <p id="estimated-revenu"></p>
             </div>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
-
 </html>

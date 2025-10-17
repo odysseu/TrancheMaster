@@ -19,6 +19,14 @@
     --toggle-dark-bg-color: #1b3b627a;
     --header-box-shadow: #0c1116b4;
     --header-left-logo: 40px;
+    --table-header-bg: #2195f335;
+    /* --table-header-text: #ffffff; */
+    --table-even-row: #f2f2f2;
+    --table-dark-even-row: #2a3b4d;
+    --table-hover-row: #e3f2fd;
+    --table-dark-hover-row: #3a4b5d;
+    --light-table-header-text: #0000005b;
+    --dark-table-header-text: #d1dbe07c;
 }
 
 body {
@@ -30,12 +38,14 @@ body {
     --input-border-color: var(--light-input-border-color);
     --slider-knob-color: var(--light-slider-knob-color);
     --toggle-bg-color: var(--toggle-light-bg-color);
+    --table-even-row-color: var(--table-even-row);
+    --table-hover-row-color: var(--table-hover-row);
+    --table-header-text: var(--light-table-header-text)
     font-family: Arial, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
     overflow-x: hidden;
     width: calc(100% - 10px);
-    /* margin: 5px; */
     transition: background-color 0.3s, color 0.3s;
 }
 
@@ -48,6 +58,9 @@ body.dark-mode {
     --input-border-color: var(--dark-input-border-color);
     --slider-knob-color: var(--dark-slider-knob-color);
     --toggle-bg-color: var(--toggle-dark-bg-color);
+    --table-even-row-color: var(--table-dark-even-row);
+    --table-hover-row-color: var(--table-dark-hover-row);
+    --table-header-text: var(--dark-table-header-text);
 }
 
 /* Slider styles */
@@ -173,7 +186,6 @@ button:hover {
 
 /* Container styles */
 .container {
-    /* width: 95%; */
     max-width: 600px;
     margin: 20px auto;
     padding: 10px;
@@ -202,6 +214,48 @@ button:hover {
 
 .results h2 {
     margin-top: 0;
+}
+
+/* Threshold table styles */
+.threshold-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 0.9em;
+}
+
+.threshold-table th {
+    background-color: var(--table-header-bg);
+    color: var(--table-header-text);
+    padding: 8px;
+    text-align: left;
+}
+
+.threshold-table td {
+    padding: 8px;
+    text-align: right;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.threshold-table tr:nth-child(even) {
+    background-color: var(--table-even-row-color);
+}
+
+.threshold-table tr:hover {
+    background-color: var(--table-hover-row-color);
+}
+
+.threshold-table td:first-child {
+    text-align: left;
+}
+
+/* Tax type group */
+.tax-type-group {
+    display: block;
+}
+
+.tax-type-group.hidden {
+    display: none;
 }
 
 .header-left .header-logo {

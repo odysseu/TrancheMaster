@@ -1,11 +1,17 @@
 // Tax thresholds for 2025 (example values, replace with actual thresholds)
 const TAX_THRESHOLDS = [
-    { min: 0, max: 11294, rate: 0 },
-    { min: 11295, max: 28797, rate: 0.11 },
-    { min: 28798, max: 82341, rate: 0.30 },
-    { min: 82342, max: 177106, rate: 0.41 },
-    { min: 177107, max: Infinity, rate: 0.45 }
+    { min: 0, max: 11497, rate: 0 },
+    { min: 11498, max: 29315, rate: 0.11 },
+    { min: 29316, max: 83823, rate: 0.30 },
+    { min: 83824, max: 180294, rate: 0.41 },
+    { min: 180295, max: Infinity, rate: 0.45 }
 ];
+
+// Helper function to format numbers to 2 decimal places if needed
+function formatNumber(value) {
+    const rounded = Math.round(value * 100) / 100;
+    return Number.isInteger(rounded) ? rounded : rounded.toFixed(2);
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     // Dark/light mode toggle
@@ -48,20 +54,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const abattementBtn = document.getElementById("abattement-btn");
     const fixedChargesBtn = document.getElementById("fixed-charges-btn");
     const fixedChargesGroup = document.getElementById("fixed-charges-group");
-    const methodRevenuToImpotText = document.getElementById("method-revenu-to-impot-text");
 
     abattementBtn.addEventListener("click", () => {
         fixedChargesGroup.style.display = "none";
         abattementBtn.classList.add("active");
         fixedChargesBtn.classList.remove("active");
-        methodRevenuToImpotText.textContent = "Revenu brut - 10% (abattement forfaitaire) = Revenu imposable";
     });
 
     fixedChargesBtn.addEventListener("click", () => {
         fixedChargesGroup.style.display = "block";
         fixedChargesBtn.classList.add("active");
         abattementBtn.classList.remove("active");
-        methodRevenuToImpotText.textContent = "Revenu brut - Frais réels = Revenu imposable";
     });
 
     // Impôt → Revenu: Percentage or value menu
@@ -69,42 +72,39 @@ document.addEventListener("DOMContentLoaded", () => {
     const taxAmountBtn = document.getElementById("tax-amount-btn");
     const taxPercentageGroup = document.getElementById("tax-percentage-group");
     const taxAmountGroup = document.getElementById("tax-amount-group");
-    const methodImpotToRevenuTypeText = document.getElementById("method-impot-to-revenu-type-text");
+    const taxTypeGroup = document.getElementById("tax-type-group");
 
     taxPercentageBtn.addEventListener("click", () => {
         taxPercentageGroup.style.display = "block";
         taxAmountGroup.style.display = "none";
+        taxTypeGroup.classList.add("hidden");
         taxPercentageBtn.classList.add("active");
         taxAmountBtn.classList.remove("active");
-        methodImpotToRevenuTypeText.textContent = "Estimation basée sur le pourcentage d'imposition";
     });
 
     taxAmountBtn.addEventListener("click", () => {
         taxAmountGroup.style.display = "block";
         taxPercentageGroup.style.display = "none";
+        taxTypeGroup.classList.remove("hidden");
         taxAmountBtn.classList.add("active");
         taxPercentageBtn.classList.remove("active");
-        methodImpotToRevenuTypeText.textContent = "Estimation basée sur le montant de l'impôt";
     });
 
     // Impôt → Revenu: 10% or charges menu
     const abattementReverseBtn = document.getElementById("abattement-reverse-btn");
     const fixedChargesReverseBtn = document.getElementById("fixed-charges-reverse-btn");
     const fixedChargesGroupReverse = document.getElementById("fixed-charges-group-reverse");
-    const methodImpotToRevenuChargesText = document.getElementById("method-impot-to-revenu-charges-text");
 
     abattementReverseBtn.addEventListener("click", () => {
         fixedChargesGroupReverse.style.display = "none";
         abattementReverseBtn.classList.add("active");
         fixedChargesReverseBtn.classList.remove("active");
-        methodImpotToRevenuChargesText.textContent = "Revenu brut - 10% (abattement forfaitaire) = Revenu imposable";
     });
 
     fixedChargesReverseBtn.addEventListener("click", () => {
         fixedChargesGroupReverse.style.display = "block";
         fixedChargesReverseBtn.classList.add("active");
         abattementReverseBtn.classList.remove("active");
-        methodImpotToRevenuChargesText.textContent = "Revenu brut - Frais réels = Revenu imposable";
     });
 
     // Revenu → Impôt logic
@@ -112,7 +112,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const revenuTypeSelect = document.getElementById("revenu-type");
     const calculateRevenuToImpotBtn = document.getElementById("calculate-revenu-to-impot-btn");
     const taxPercentageElement = document.getElementById("tax-percentage");
-    const moneyPerThresholdElement = document.getElementById("money-per-threshold");
+    const thresholdBreakdownElement = document.getElementById("threshold-breakdown");
+    const totalTaxElement = document.getElementById("total-tax");
     const missingMoneyElement = document.getElementById("missing-money");
 
     calculateRevenuToImpotBtn.addEventListener("click", () => {
@@ -136,8 +137,23 @@ document.addEventListener("DOMContentLoaded", () => {
             taxableIncome = yearlyRevenu - fixedCharges;
         }
 
-        const tax = calculateTax(taxableIncome);
+        const { tax, breakdown } = calculateTaxWithBreakdown(taxableIncome);
         const taxPercentage = (tax / yearlyRevenu) * 100;
+
+        // Display threshold breakdown
+        thresholdBreakdownElement.innerHTML = "";
+        breakdown.forEach(threshold => {
+            const row = document.createElement("tr");
+            const formattedTaxableAmount = formatNumber(threshold.taxableAmount);
+            const formattedTax = formatNumber(threshold.tax);
+            row.innerHTML = `
+                <td>${formatNumber(threshold.min)}\u00A0-\u00A0${threshold.max === Infinity ? "+∞" : formatNumber(threshold.max)}</td>
+                <td>${formattedTaxableAmount}</td>
+                <td>${threshold.rate * 100}</td>
+                <td>${formattedTax}</td>
+            `;
+            thresholdBreakdownElement.appendChild(row);
+        });
 
         const currentThreshold = TAX_THRESHOLDS.find(threshold =>
             taxableIncome >= threshold.min && taxableIncome <= threshold.max
@@ -149,9 +165,9 @@ document.addEventListener("DOMContentLoaded", () => {
         let missingMoneyYearly = nextThreshold ? nextThreshold.min - taxableIncome : 0;
         let missingMoneyMonthly = missingMoneyYearly / 12;
 
-        taxPercentageElement.textContent = `Taux d'imposition : ${taxPercentage.toFixed(2)}%`;
-        moneyPerThresholdElement.textContent = `Impôt par tranche : ${formatMoneyPerThreshold(taxableIncome)}`;
-        missingMoneyElement.textContent = `Il manque ${missingMoneyYearly.toFixed(2)}€ par an (${missingMoneyMonthly.toFixed(2)}€ par mois) pour atteindre la prochaine tranche.`;
+        taxPercentageElement.textContent = `Taux d'imposition : ${taxPercentage.toFixed(2)} %`;
+        totalTaxElement.textContent = `Impôt total : ${formatNumber(tax)}\u00A0€`;
+        missingMoneyElement.textContent = `Il manque ${formatNumber(missingMoneyYearly)}\u00A0€ par an (${formatNumber(missingMoneyMonthly)}\u00A0€ par mois) pour atteindre la prochaine tranche.`;
     });
 
     // Impôt → Revenu logic
@@ -172,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
             const estimatedRevenu = estimateRevenuFromTaxPercentage(taxPercentage, chargesType, fixedCharges);
-            estimatedRevenuElement.textContent = `Revenu annuel estimé : ${estimatedRevenu.yearly.toFixed(2)}€ (Mensuel : ${estimatedRevenu.monthly.toFixed(2)}€)`;
+            estimatedRevenuElement.textContent = `Revenu annuel estimé : ${formatNumber(estimatedRevenu.yearly)}\u00A0€ (Mensuel : ${formatNumber(estimatedRevenu.monthly)}\u00A0€)`;
         } else {
             const taxAmount = parseFloat(document.getElementById("tax-amount").value);
             if (isNaN(taxAmount)) {
@@ -182,32 +198,31 @@ document.addEventListener("DOMContentLoaded", () => {
             const taxType = taxTypeSelect.value;
             const yearlyTax = taxType === "monthly" ? taxAmount * 12 : taxAmount;
             const estimatedRevenu = estimateRevenuFromTax(yearlyTax, chargesType, fixedCharges);
-            estimatedRevenuElement.textContent = `Revenu annuel estimé : ${estimatedRevenu.yearly.toFixed(2)}€ (Mensuel : ${estimatedRevenu.monthly.toFixed(2)}€)`;
+            estimatedRevenuElement.textContent = `Revenu annuel estimé : ${formatNumber(estimatedRevenu.yearly)}\u00A0€ (Mensuel : ${formatNumber(estimatedRevenu.monthly)}\u00A0€)`;
         }
     });
 
-    // Function to calculate tax based on taxable income
-    function calculateTax(taxableIncome) {
+    // Function to calculate tax with breakdown by threshold
+    function calculateTaxWithBreakdown(taxableIncome) {
         let tax = 0;
-        for (const threshold of TAX_THRESHOLDS) {
-            if (taxableIncome > threshold.min) {
-                const taxableAmount = Math.min(taxableIncome, threshold.max) - threshold.min;
-                tax += taxableAmount * threshold.rate;
-            }
-        }
-        return tax;
-    }
+        const breakdown = [];
 
-    // Function to format money per threshold
-    function formatMoneyPerThreshold(taxableIncome) {
-        let result = "";
         for (const threshold of TAX_THRESHOLDS) {
             if (taxableIncome > threshold.min) {
                 const taxableAmount = Math.min(taxableIncome, threshold.max) - threshold.min;
-                result += `${taxableAmount.toFixed(2)}€ à ${(threshold.rate * 100)}%, `;
+                const thresholdTax = taxableAmount * threshold.rate;
+                tax += thresholdTax;
+                breakdown.push({
+                    min: threshold.min,
+                    max: threshold.max,
+                    rate: threshold.rate,
+                    taxableAmount: taxableAmount,
+                    tax: thresholdTax
+                });
             }
         }
-        return result.slice(0, -2);
+
+        return { tax: formatNumber(tax), breakdown };
     }
 
     // Function to estimate revenu from tax amount
@@ -218,8 +233,8 @@ document.addEventListener("DOMContentLoaded", () => {
             estimatedTaxableIncome / 0.9 :
             estimatedTaxableIncome + fixedCharges;
         return {
-            yearly: estimatedRevenu,
-            monthly: estimatedRevenu / 12
+            yearly: formatNumber(estimatedRevenu),
+            monthly: formatNumber(estimatedRevenu / 12)
         };
     }
 
@@ -240,8 +255,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         return {
-            yearly: estimatedRevenu,
-            monthly: estimatedRevenu / 12
+            yearly: formatNumber(estimatedRevenu),
+            monthly: formatNumber(estimatedRevenu / 12)
         };
+    }
+
+    // Function to calculate tax based on taxable income
+    function calculateTax(taxableIncome) {
+        let tax = 0;
+        for (const threshold of TAX_THRESHOLDS) {
+            if (taxableIncome > threshold.min) {
+                const taxableAmount = Math.min(taxableIncome, threshold.max) - threshold.min;
+                tax += taxableAmount * threshold.rate;
+            }
+        }
+        return formatNumber(tax);
     }
 });

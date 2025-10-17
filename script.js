@@ -74,6 +74,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const taxTypeGroup = document.getElementById("tax-type-group");
     const fixedChargesGroupReverse = document.getElementById("fixed-charges-group-reverse");
 
+    // Set max value for tax percentage input
+    taxPercentageInput.setAttribute("max", "40.50");
+    taxPercentageInput.setAttribute("step", "0.01");
+
     // Initialize visibility on page load
     taxTypeGroup.classList.add("hidden");
 
@@ -83,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
         impotToRevenuSection.classList.remove("active");
         revenuToImpotBtn.classList.add("active");
         impotToRevenuBtn.classList.remove("active");
-        calculateRevenuToImpot(); // Recalculate when switching sections
+        calculateRevenuToImpot();
     });
 
     impotToRevenuBtn.addEventListener("click", () => {
@@ -91,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
         revenuToImpotSection.classList.remove("active");
         impotToRevenuBtn.classList.add("active");
         revenuToImpotBtn.classList.remove("active");
-        calculateImpotToRevenu(); // Recalculate when switching sections
+        calculateImpotToRevenu();
     });
 
     // Revenu → Impôt: 10% or charges menu
@@ -99,14 +103,14 @@ document.addEventListener("DOMContentLoaded", () => {
         fixedChargesGroup.style.display = "none";
         abattementBtn.classList.add("active");
         fixedChargesBtn.classList.remove("active");
-        calculateRevenuToImpot(); // Recalculate when changing method
+        calculateRevenuToImpot();
     });
 
     fixedChargesBtn.addEventListener("click", () => {
         fixedChargesGroup.style.display = "block";
         fixedChargesBtn.classList.add("active");
         abattementBtn.classList.remove("active");
-        calculateRevenuToImpot(); // Recalculate when changing method
+        calculateRevenuToImpot();
     });
 
     // Impôt → Revenu: Percentage or value menu
@@ -116,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
         taxTypeGroup.classList.add("hidden");
         taxPercentageBtn.classList.add("active");
         taxAmountBtn.classList.remove("active");
-        calculateImpotToRevenu(); // Recalculate when changing method
+        calculateImpotToRevenu();
     });
 
     taxAmountBtn.addEventListener("click", () => {
@@ -125,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
         taxTypeGroup.classList.remove("hidden");
         taxAmountBtn.classList.add("active");
         taxPercentageBtn.classList.remove("active");
-        calculateImpotToRevenu(); // Recalculate when changing method
+        calculateImpotToRevenu();
     });
 
     // Impôt → Revenu: 10% or charges menu
@@ -133,14 +137,14 @@ document.addEventListener("DOMContentLoaded", () => {
         fixedChargesGroupReverse.style.display = "none";
         abattementReverseBtn.classList.add("active");
         fixedChargesReverseBtn.classList.remove("active");
-        calculateImpotToRevenu(); // Recalculate when changing method
+        calculateImpotToRevenu();
     });
 
     fixedChargesReverseBtn.addEventListener("click", () => {
         fixedChargesGroupReverse.style.display = "block";
         fixedChargesReverseBtn.classList.add("active");
         abattementReverseBtn.classList.remove("active");
-        calculateImpotToRevenu(); // Recalculate when changing method
+        calculateImpotToRevenu();
     });
 
     // Add event listeners for input changes
@@ -207,7 +211,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         taxPercentageElement.textContent = `Taux d'imposition : ${taxPercentage.toFixed(2)}\u00A0%`;
         totalTaxElement.textContent = `Impôt total : ${formatNumber(tax)}\u00A0€`;
-        missingMoneyElement.textContent = `Il manque ${formatNumber(missingMoneyYearly)}\u00A0€ par an (${formatNumber(missingMoneyMonthly)}\u00A0€ par mois) pour atteindre la prochaine tranche.`;
+
+        if (tax === 0) {
+            missingMoneyElement.textContent = `Avec un revenu imposable de ${formatNumber(taxableIncome)}\u00A0€, vous ne payez pas d'impôt. Vous êtes sous le premier seuil d'imposition (${formatNumber(TAX_THRESHOLDS[1].min)}\u00A0€).`;
+        } else if (!nextThreshold) {
+            missingMoneyElement.textContent = "Vous êtes un grand contributeur ! Vous avez dépassé la dernière tranche d'imposition.";
+        } else {
+            missingMoneyElement.textContent = `Il manque ${formatNumber(missingMoneyYearly)}\u00A0€ par an (${formatNumber(missingMoneyMonthly)}\u00A0€ par mois) pour atteindre la prochaine tranche.`;
+        }
     }
 
     // Impôt → Revenu logic
@@ -223,6 +234,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 estimatedRevenuElement.textContent = "";
                 return;
             }
+
+            // Check if tax percentage is above maximum
+            if (taxPercentage > 40.50) {
+                estimatedRevenuElement.textContent = "Le pourcentage d'imposition ne peut pas dépasser 40,50%. Veuillez entrer une valeur valide.";
+                return;
+            }
+
+            if (taxPercentage === 0) {
+                const maxRevenuNoTax = TAX_THRESHOLDS[1].min / (chargesType === "abattement" ? 0.9 : 1);
+                estimatedRevenuElement.textContent = `Avec 0% d'imposition, votre revenu annuel est inférieur à ${formatNumber(maxRevenuNoTax)}\u00A0€ (${formatNumber(maxRevenuNoTax/12)}\u00A0€/mois).`;
+                return;
+            }
+
             const estimatedRevenu = estimateRevenuFromTaxPercentage(taxPercentage, chargesType, fixedCharges);
             estimatedRevenuElement.textContent = `Revenu annuel estimé : ${formatNumber(estimatedRevenu.yearly)}\u00A0€ (Mensuel : ${formatNumber(estimatedRevenu.monthly)}\u00A0€)`;
         } else {
@@ -231,6 +255,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 estimatedRevenuElement.textContent = "";
                 return;
             }
+
+            if (taxAmount === 0) {
+                const maxRevenuNoTax = TAX_THRESHOLDS[1].min / (chargesType === "abattement" ? 0.9 : 1);
+                estimatedRevenuElement.textContent = `Avec 0€ d'impôt, votre revenu annuel est inférieur à ${formatNumber(maxRevenuNoTax)}\u00A0€ (${formatNumber(maxRevenuNoTax/12)}\u00A0€/mois).`;
+                return;
+            }
+
             const taxType = taxTypeSelect.value;
             const yearlyTax = taxType === "monthly" ? taxAmount * 12 : taxAmount;
             const estimatedRevenu = estimateRevenuFromTax(yearlyTax, chargesType, fixedCharges);
@@ -263,6 +294,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Function to estimate revenu from tax amount
     function estimateRevenuFromTax(taxAmount, chargesType, fixedCharges) {
+        // If tax is 0, return the maximum revenue for 0% tax
+        if (taxAmount === 0) {
+            const maxRevenuNoTax = TAX_THRESHOLDS[1].min / (chargesType === "abattement" ? 0.9 : 1);
+            return {
+                yearly: formatNumber(maxRevenuNoTax),
+                monthly: formatNumber(maxRevenuNoTax / 12)
+            };
+        }
+
         // Simplified estimation: Assume taxable income is in the highest threshold
         let estimatedTaxableIncome = taxAmount / TAX_THRESHOLDS[TAX_THRESHOLDS.length - 1].rate;
         let estimatedRevenu = chargesType === "abattement" ?
@@ -276,6 +316,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Function to estimate revenu from tax percentage
     function estimateRevenuFromTaxPercentage(taxPercentage, chargesType, fixedCharges) {
+        // If tax percentage is 0, return the maximum revenue for 0% tax
+        if (taxPercentage === 0) {
+            const maxRevenuNoTax = TAX_THRESHOLDS[1].min / (chargesType === "abattement" ? 0.9 : 1);
+            return {
+                yearly: formatNumber(maxRevenuNoTax),
+                monthly: formatNumber(maxRevenuNoTax / 12)
+            };
+        }
+
         const taxRate = taxPercentage / 100;
         let estimatedRevenu = 100000; // Initial guess
         let taxableIncome = chargesType === "abattement" ? estimatedRevenu * 0.9 : estimatedRevenu - fixedCharges;

@@ -74,6 +74,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const taxAmountGroup = document.getElementById("tax-amount-group");
     const taxTypeGroup = document.getElementById("tax-type-group");
 
+    // Initialize visibility on page load
+    taxTypeGroup.classList.add("hidden");
+
     taxPercentageBtn.addEventListener("click", () => {
         taxPercentageGroup.style.display = "block";
         taxAmountGroup.style.display = "none";

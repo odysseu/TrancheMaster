@@ -1,0 +1,17 @@
+{
+  "name": "TrancheMaster",
+  "short_name": "TrancheMaster",
+  "description": "This simulator helps determine when it becomes more cost-effective to buy a property rather than continue renting.",
+  "scope": "/TrancheMaster/",
+  "start_url": "/TrancheMaster/",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "logo-TrancheMaster.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

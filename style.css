@@ -27,6 +27,8 @@
     --table-dark-hover-row: #3a4b5d;
     --light-table-header-text: #0000005b;
     --dark-table-header-text: #d1dbe07c;
+    --dark-input-background: #465e792b;
+    --light-input-background: #aab2b73d;
 }
 
 body {
@@ -40,7 +42,8 @@ body {
     --toggle-bg-color: var(--toggle-light-bg-color);
     --table-even-row-color: var(--table-even-row);
     --table-hover-row-color: var(--table-hover-row);
-    --table-header-text: var(--light-table-header-text)
+    --table-header-text: var(--light-table-header-text);
+    --input-background: var(--light-input-background);
     font-family: Arial, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
@@ -61,6 +64,7 @@ body.dark-mode {
     --table-even-row-color: var(--table-dark-even-row);
     --table-hover-row-color: var(--table-dark-hover-row);
     --table-header-text: var(--dark-table-header-text);
+    --input-background: var(--dark-input-background);
 }
 
 /* Slider styles */
@@ -162,7 +166,7 @@ input:checked + .slider:before {
     font-weight: bold;
 }
 
-input, select, button {
+select, button {
     width: 100%;
     padding: 8px;
     margin-top: 5px;
@@ -170,6 +174,17 @@ input, select, button {
     border-radius: 4px;
     box-sizing: border-box;
     background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: var(--input-background);
     color: var(--text-color);
 }
 

@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculateur d'Impôt sur le Revenu</title>
-    <link rel="apple-touch-icon" sizes="180x180" href="logo-TrancheMaster.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="logos/logo-TrancheMaster.png">
     <link rel="canonical" href="https://odysseu.github.io/HabitatCalc/" />
     <link rel="manifest" href="/TrancheMaster/webmanifest.json">
     <link rel="stylesheet" href="style.css">
-    <link id="favicon" rel="icon" href="favicon.ico" type="image/x-icon">
+    <link id="favicon" rel="icon" href="logos/favicon.ico" type="image/x-icon">
 </head>
 <body>
     <header class="sticky-header">
         <div class="header-left">
             <div class="github-logo">
                 <a href="https://github.com/odysseu/TrancheMaster" target="_self">
-                    <img src="logo-TrancheMaster.png" alt="GitHub Logo" class="header-logo" id="github-logo">
+                    <img src="logos/logo-TrancheMaster.png" alt="App Logo" class="header-logo" id="github-logo">
                 </a>
             </div>
         </div>
@@ -38,7 +38,7 @@
         <div id="revenu-to-impot-section" class="section active">
             <div class="input-group">
                 <label for="revenu">Revenu (€) :</label>
-                <input type="number" id="revenu" placeholder="Entrez votre revenu">
+                <input type="number" id="revenu" placeholder="Entrez votre revenu" inputmode="decimal" step="0.01">
             </div>
             <div class="input-group">
                 <label for="revenu-type">Type de revenu :</label>
@@ -54,7 +54,7 @@
             </div>
             <div class="input-group" id="fixed-charges-group" style="display: none;">
                 <label for="fixed-charges">Frais réels (€) :</label>
-                <input type="number" id="fixed-charges" placeholder="Entrez vos frais réels">
+                <input type="number" id="fixed-charges" placeholder="Entrez vos frais réels" inputmode="decimal" step="0.01">
             </div>
             <div class="results">
                 <h2>Résultats</h2>
@@ -86,11 +86,11 @@
             </div>
             <div class="input-group" id="tax-percentage-group">
                 <label for="tax-percentage-input">Pourcentage d'imposition (%) :</label>
-                <input type="number" id="tax-percentage-input" step="0.01" placeholder="Entrez le pourcentage d'imposition">
+                <input type="number" id="tax-percentage-input" inputmode="decimal" step="0.01" placeholder="Entrez le pourcentage d'imposition">
             </div>
             <div class="input-group tax-type-group hidden" id="tax-amount-group">
                 <label for="tax-amount">Montant de l'impôt (€) :</label>
-                <input type="number" id="tax-amount" placeholder="Entrez le montant de l'impôt">
+                <input type="number" id="tax-amount" inputmode="decimal" step="0.01" placeholder="Entrez le montant de l'impôt">
             </div>
             <div class="input-group tax-type-group hidden" id="tax-type-group">
                 <label for="tax-type">Type de montant :</label>
@@ -104,9 +104,9 @@
                 <button id="abattement-reverse-btn" class="menu-btn active">Abattement 10%</button>
                 <button id="fixed-charges-reverse-btn" class="menu-btn">Frais réels (€)</button>
             </div>
-            <div class="input-group" id="fixed-charges-group-reverse" style="display: none;">
+            <div class="input-group" id="fixed-charges-group-reverse" inputmode="decimal" step="0.01" style="display: none;">
                 <label for="fixed-charges-reverse">Frais réels (€) :</label>
-                <input type="number" id="fixed-charges-reverse" placeholder="Entrez vos frais réels">
+                <input type="number" id="fixed-charges-reverse" inputmode="decimal" step="0.01" placeholder="Entrez vos frais réels">
             </div>
             <div class="results">
                 <h2>Résultats</h2>

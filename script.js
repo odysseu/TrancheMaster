@@ -7,6 +7,60 @@ const TAX_THRESHOLDS = [
     { min: 180295, max: Infinity, rate: 0.45 }
 ];
 
+// Pre-calculate min and max tax percentages for each threshold
+const THRESHOLD_TAX_RANGES = [];
+for (let i = 0; i < TAX_THRESHOLDS.length; i++) {
+    const threshold = TAX_THRESHOLDS[i];
+
+    // Calculate minimum tax percentage for this threshold
+    let minTaxPercentage = 0;
+    if (i > 0) {
+        // Tax from previous threshold
+        const prevThreshold = TAX_THRESHOLDS[i-1];
+        const prevThresholdTax = (prevThreshold.max - prevThreshold.min) * prevThreshold.rate;
+
+        // Tax from current threshold (minimum)
+        const currentThresholdTax = 0;
+
+        // Total taxable income at the start of this threshold
+        const totalIncomeAtStart = threshold.min;
+
+        // Minimum tax percentage
+        minTaxPercentage = (prevThresholdTax + currentThresholdTax) / totalIncomeAtStart * 100;
+    }
+
+    // Calculate maximum tax percentage for this threshold
+    let maxTaxPercentage = 0;
+    if (threshold.max !== Infinity) {
+        // Tax from this threshold (maximum)
+        const currentThresholdTax = (threshold.max - threshold.min) * threshold.rate;
+
+        // Tax from previous thresholds
+        let prevThresholdsTax = 0;
+        for (let j = 0; j < i; j++) {
+            const prevThreshold = TAX_THRESHOLDS[j];
+            prevThresholdsTax += (prevThreshold.max - prevThreshold.min) * prevThreshold.rate;
+        }
+
+        // Total taxable income at the end of this threshold
+        const totalIncomeAtEnd = threshold.max;
+
+        // Maximum tax percentage
+        maxTaxPercentage = (prevThresholdsTax + currentThresholdTax) / totalIncomeAtEnd * 100;
+    } else {
+        // For the last threshold, we can't calculate a max percentage
+        maxTaxPercentage = Infinity;
+    }
+
+    THRESHOLD_TAX_RANGES.push({
+        min: threshold.min,
+        max: threshold.max,
+        rate: threshold.rate,
+        minTaxPercentage: minTaxPercentage,
+        maxTaxPercentage: maxTaxPercentage
+    });
+}
+
 // Helper function to format numbers to 2 decimal places if needed
 function formatNumber(value) {
     const rounded = Math.round(value * 100) / 100;
@@ -247,7 +301,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            const estimatedRevenu = estimateRevenuFromTaxPercentage(taxPercentage, chargesType, fixedCharges);
+            // Find the appropriate threshold range for this tax percentage
+            let targetThreshold = null;
+            for (let i = 0; i < THRESHOLD_TAX_RANGES.length; i++) {
+                const range = THRESHOLD_TAX_RANGES[i];
+                if (taxPercentage >= range.minTaxPercentage && (taxPercentage <= range.maxTaxPercentage || range.maxTaxPercentage === Infinity)) {
+                    targetThreshold = range;
+                    break;
+                }
+            }
+
+            // If no threshold found, use the last one
+            if (!targetThreshold) {
+                targetThreshold = THRESHOLD_TAX_RANGES[THRESHOLD_TAX_RANGES.length - 1];
+            }
+
+            // Calculate estimated revenue based on the target threshold
+            const estimatedRevenu = estimateRevenuFromTaxPercentageAndThreshold(taxPercentage, chargesType, fixedCharges, targetThreshold);
             estimatedRevenuElement.textContent = `Revenu annuel estimé : ${formatNumber(estimatedRevenu.yearly)}\u00A0€ (Mensuel : ${formatNumber(estimatedRevenu.monthly)}\u00A0€)`;
         } else {
             const taxAmount = parseFloat(taxAmountInput.value);
@@ -303,20 +373,72 @@ document.addEventListener("DOMContentLoaded", () => {
             };
         }
 
-        // Simplified estimation: Assume taxable income is in the highest threshold
-        let estimatedTaxableIncome = taxAmount / TAX_THRESHOLDS[TAX_THRESHOLDS.length - 1].rate;
-        let estimatedRevenu = chargesType === "abattement" ?
-            estimatedTaxableIncome / 0.9 :
-            estimatedTaxableIncome + fixedCharges;
+        // Find the threshold where this tax amount would fall
+        let cumulativeTax = 0;
+        let targetThresholdIndex = -1;
+
+        for (let i = 0; i < TAX_THRESHOLDS.length; i++) {
+            const threshold = TAX_THRESHOLDS[i];
+            if (i === 0) continue; // Skip first threshold (0% tax)
+
+            const prevThreshold = TAX_THRESHOLDS[i-1];
+            const prevThresholdTax = (prevThreshold.max - prevThreshold.min) * prevThreshold.rate;
+            cumulativeTax += prevThresholdTax;
+
+            const currentThresholdTax = (threshold.max - threshold.min) * threshold.rate;
+            if (cumulativeTax + currentThresholdTax >= taxAmount) {
+                targetThresholdIndex = i;
+                break;
+            }
+            cumulativeTax += currentThresholdTax;
+        }
+
+        // If no threshold found, use the last one
+        if (targetThresholdIndex === -1) {
+            targetThresholdIndex = TAX_THRESHOLDS.length - 1;
+        }
+
+        const targetThreshold = TAX_THRESHOLDS[targetThresholdIndex];
+
+        // Calculate taxable income for this threshold
+        let taxableIncome = 0;
+        let remainingTax = taxAmount;
+
+        // Add tax from previous thresholds
+        for (let i = 1; i < targetThresholdIndex; i++) {
+            const threshold = TAX_THRESHOLDS[i];
+            const thresholdTax = (threshold.max - threshold.min) * threshold.rate;
+            remainingTax -= thresholdTax;
+            taxableIncome = threshold.max;
+        }
+
+        // Calculate taxable income in the target threshold
+        if (targetThresholdIndex > 0) {
+            const prevThreshold = TAX_THRESHOLDS[targetThresholdIndex - 1];
+            taxableIncome = prevThreshold.max + (remainingTax / targetThreshold.rate);
+        } else {
+            taxableIncome = remainingTax / targetThreshold.rate;
+        }
+
+        // Calculate revenue based on charges type
+        let estimatedRevenu;
+        if (chargesType === "abattement") {
+            estimatedRevenu = taxableIncome / 0.9;
+        } else {
+            estimatedRevenu = taxableIncome + fixedCharges;
+        }
+
         return {
             yearly: formatNumber(estimatedRevenu),
             monthly: formatNumber(estimatedRevenu / 12)
         };
     }
 
-    // Function to estimate revenu from tax percentage
-    function estimateRevenuFromTaxPercentage(taxPercentage, chargesType, fixedCharges) {
-        // If tax percentage is 0, return the maximum revenue for 0% tax
+    // New function to estimate revenu from tax percentage using threshold ranges
+    function estimateRevenuFromTaxPercentageAndThreshold(taxPercentage, chargesType, fixedCharges, targetThreshold) {
+        const taxRate = taxPercentage / 100;
+
+        // For 0% tax, return the maximum revenue for 0% tax
         if (taxPercentage === 0) {
             const maxRevenuNoTax = TAX_THRESHOLDS[1].min / (chargesType === "abattement" ? 0.9 : 1);
             return {
@@ -325,18 +447,61 @@ document.addEventListener("DOMContentLoaded", () => {
             };
         }
 
-        const taxRate = taxPercentage / 100;
-        let estimatedRevenu = 100000; // Initial guess
-        let taxableIncome = chargesType === "abattement" ? estimatedRevenu * 0.9 : estimatedRevenu - fixedCharges;
-        let calculatedTax = calculateTax(taxableIncome);
+        // Calculate the taxable income that would result in the given tax percentage
+        // We'll use an iterative approach to find the correct income
+
+        // Start with an initial guess based on the target threshold
+        let estimatedTaxableIncome;
+        if (targetThreshold.min === 0) {
+            // For the first taxable threshold
+            estimatedTaxableIncome = targetThreshold.max;
+        } else {
+            // For other thresholds, start with the middle of the range
+            estimatedTaxableIncome = (targetThreshold.min + targetThreshold.max) / 2;
+        }
+
+        // Calculate initial revenue based on charges type
+        let estimatedRevenu = chargesType === "abattement" ?
+            estimatedTaxableIncome / 0.9 :
+            estimatedTaxableIncome + fixedCharges;
+
+        // Calculate initial tax and tax rate
+        let calculatedTax = calculateTax(estimatedTaxableIncome);
         let calculatedTaxRate = calculatedTax / estimatedRevenu;
 
-        // Iteratively adjust estimated revenu to match tax percentage
-        while (Math.abs(calculatedTaxRate - taxRate) > 0.001) {
-            estimatedRevenu += (taxRate - calculatedTaxRate) * estimatedRevenu;
-            taxableIncome = chargesType === "abattement" ? estimatedRevenu * 0.9 : estimatedRevenu - fixedCharges;
-            calculatedTax = calculateTax(taxableIncome);
+        // Iteratively adjust estimated revenue to match tax percentage
+        let iterations = 0;
+        const maxIterations = 100;
+        const tolerance = 0.001;
+
+        while (Math.abs(calculatedTaxRate - taxRate) > tolerance && iterations < maxIterations) {
+            // Adjust the estimate based on the difference between calculated and target tax rates
+            const adjustmentFactor = (taxRate - calculatedTaxRate) * 0.5;
+            estimatedRevenu *= (1 + adjustmentFactor);
+
+            // Recalculate taxable income based on new revenue estimate
+            estimatedTaxableIncome = chargesType === "abattement" ?
+                estimatedRevenu * 0.9 :
+                estimatedRevenu - fixedCharges;
+
+            // Ensure we stay within the target threshold range
+            if (estimatedTaxableIncome < targetThreshold.min) {
+                estimatedTaxableIncome = targetThreshold.min;
+                estimatedRevenu = chargesType === "abattement" ?
+                    targetThreshold.min / 0.9 :
+                    targetThreshold.min + fixedCharges;
+            } else if (targetThreshold.max !== Infinity && estimatedTaxableIncome > targetThreshold.max) {
+                estimatedTaxableIncome = targetThreshold.max;
+                estimatedRevenu = chargesType === "abattement" ?
+                    targetThreshold.max / 0.9 :
+                    targetThreshold.max + fixedCharges;
+            }
+
+            // Recalculate tax and tax rate
+            calculatedTax = calculateTax(estimatedTaxableIncome);
             calculatedTaxRate = calculatedTax / estimatedRevenu;
+
+            iterations++;
         }
 
         return {

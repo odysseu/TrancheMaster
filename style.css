@@ -18,9 +18,7 @@
     --toggle-light-bg-color: #b8cee082;
     --toggle-dark-bg-color: #1b3b627a;
     --header-box-shadow: #0c1116b4;
-    --header-left-logo: 40px;
     --table-header-bg: #2195f335;
-    /* --table-header-text: #ffffff; */
     --table-even-row: #f2f2f2;
     --table-dark-even-row: #2a3b4d;
     --table-hover-row: #e3f2fd;
@@ -29,6 +27,14 @@
     --dark-table-header-text: #d1dbe07c;
     --dark-input-background: #465e792b;
     --light-input-background: #aab2b73d;
+    --language-select-bg: #f0f0f0;
+    --language-select-bg-dark: #3a4a5a;
+    --language-select-border: #a6a6a68a;
+    --language-select-border-dark: #cccccc1f;
+    --language-select-arrow: #555555;
+    --language-select-arrow-dark: #d1dbe0;
+    --header-left-logo: 40px;
+    --header-right-height: 24px;
 }
 
 body {
@@ -44,6 +50,9 @@ body {
     --table-hover-row-color: var(--table-hover-row);
     --table-header-text: var(--light-table-header-text);
     --input-background: var(--light-input-background);
+    --language-select-bg: var(--language-select-bg);
+    --language-select-border: var(--language-select-border);
+    --language-select-arrow: var(--language-select-arrow);
     font-family: Arial, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
@@ -65,13 +74,16 @@ body.dark-mode {
     --table-hover-row-color: var(--table-dark-hover-row);
     --table-header-text: var(--dark-table-header-text);
     --input-background: var(--dark-input-background);
+    --language-select-bg: var(--language-select-bg-dark);
+    --language-select-border: var(--language-select-border-dark);
+    --language-select-arrow: var(--language-select-arrow-dark);
 }
 
 /* Slider styles */
 .switch {
     display: inline-block;
     width: 50px;
-    height: 24px;
+    height: var(--header-right-height);
     position: relative;
 }
 
@@ -125,12 +137,63 @@ input:checked + .slider:before {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 10px;
 }
 
 .sticky-header h1 {
     margin: 0;
     font-size: large;
     text-align: center;
+}
+
+/* Header right container styling */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Language Selector Styles */
+.language-selector-container {
+    position: relative;
+}
+
+#language-select {
+    margin-top: 0px;
+    padding: 6px 12px;
+    border: 1px solid var(--language-select-border);
+    border-radius: 6px;
+    background-color: var(--language-select-bg);
+    color: var(--text-color);
+    font-size: 0.9em;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23555555'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px;
+    padding-right: 30px;
+    min-width: 130px;
+    height: var(--header-right-height) + 6px;
+    transition: all 0.3s ease;
+}
+
+#language-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+#language-select option {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+/* Add hover effect */
+#language-select:hover {
+    background-color: var(--button-background);
 }
 
 /* Menu styles */
@@ -203,7 +266,7 @@ button:hover {
 .container {
     max-width: 600px;
     margin: 20px auto;
-    padding: 10px;
+    padding: 20px;
     border-radius: 10px;
     border: 1px solid var(--border-color);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -276,4 +339,17 @@ button:hover {
 .header-left .header-logo {
     max-height: var(--header-left-logo);
     cursor: pointer;
+}
+
+/* Custom dropdown styling for language selector */
+@media (max-width: 480px) {
+    .header-right {
+        gap: 10px;
+    }
+
+    #language-select {
+        min-width: 110px;
+        padding: 6px 8px;
+        font-size: 0.8em;
+    }
 }

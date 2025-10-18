@@ -74,7 +74,13 @@ let revenuInput, revenuTypeSelect, fixedChargesInput,
     estimatedRevenuElement, abattementBtn, fixedChargesBtn, taxPercentageBtn, taxAmountBtn,
     abattementReverseBtn, fixedChargesReverseBtn;
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    // Wait for translations to load
+    await window.translationSystem.loadTranslations(window.translationSystem.currentLanguage);
+
+    // Register calculation functions with translation system
+    window.translationSystem.registerCalculationFunctions(calculateRevenuToImpot, calculateImpotToRevenu);
+
     // Dark/light mode toggle
     const darkModeToggle = document.getElementById("dark-mode-toggle");
     if (localStorage.getItem("dark-mode") === "enabled") {
@@ -263,15 +269,19 @@ document.addEventListener("DOMContentLoaded", () => {
         let missingMoneyYearly = nextThreshold ? nextThreshold.min - taxableIncome : 0;
         let missingMoneyMonthly = missingMoneyYearly / 12;
 
-        taxPercentageElement.textContent = `Taux d'imposition : ${taxPercentage.toFixed(2)}\u00A0%`;
-        totalTaxElement.textContent = `Impôt total : ${formatNumber(tax)}\u00A0€`;
+        taxPercentageElement.textContent = window.translationSystem.getTranslation("tax-percentage-prefix") + taxPercentage.toFixed(2) + "%";
+        totalTaxElement.textContent = window.translationSystem.getTranslation("total-tax-prefix") + formatNumber(tax) + "€";
 
         if (tax === 0) {
-            missingMoneyElement.textContent = `Avec un revenu imposable de ${formatNumber(taxableIncome)}\u00A0€, vous ne payez pas d'impôt. Vous êtes sous le premier seuil d'imposition (${formatNumber(TAX_THRESHOLDS[1].min)}\u00A0€).`;
+            missingMoneyElement.textContent = window.translationSystem.getTranslation("no-tax-complete",
+                formatNumber(taxableIncome),
+                formatNumber(TAX_THRESHOLDS[1].min));
         } else if (!nextThreshold) {
-            missingMoneyElement.textContent = "Vous êtes un grand contributeur ! Vous avez dépassé la dernière tranche d'imposition.";
+            missingMoneyElement.textContent = window.translationSystem.getTranslation("max-contributor-message");
         } else {
-            missingMoneyElement.textContent = `Il manque ${formatNumber(missingMoneyYearly)}\u00A0€ par an (${formatNumber(missingMoneyMonthly)}\u00A0€ par mois) pour atteindre la prochaine tranche.`;
+            missingMoneyElement.textContent = window.translationSystem.getTranslation("missing-money-complete",
+                formatNumber(missingMoneyYearly),
+                formatNumber(missingMoneyMonthly));
         }
     }
 
@@ -291,13 +301,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Check if tax percentage is above maximum
             if (taxPercentage > 40.50) {
-                estimatedRevenuElement.textContent = "Le pourcentage d'imposition ne peut pas dépasser 40,50%. Veuillez entrer une valeur valide.";
+                estimatedRevenuElement.textContent = window.translationSystem.getTranslation("tax-percentage-error");
                 return;
             }
 
             if (taxPercentage === 0) {
                 const maxRevenuNoTax = TAX_THRESHOLDS[1].min / (chargesType === "abattement" ? 0.9 : 1);
-                estimatedRevenuElement.textContent = `Avec 0% d'imposition, votre revenu annuel est inférieur à ${formatNumber(maxRevenuNoTax)}\u00A0€ (${formatNumber(maxRevenuNoTax/12)}\u00A0€/mois).`;
+                estimatedRevenuElement.textContent = window.translationSystem.getTranslation("zero-tax-message",
+                    formatNumber(maxRevenuNoTax),
+                    formatNumber(maxRevenuNoTax/12));
                 return;
             }
 
@@ -318,7 +330,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Calculate estimated revenue based on the target threshold
             const estimatedRevenu = estimateRevenuFromTaxPercentageAndThreshold(taxPercentage, chargesType, fixedCharges, targetThreshold);
-            estimatedRevenuElement.textContent = `Revenu annuel estimé : ${formatNumber(estimatedRevenu.yearly)}\u00A0€ (Mensuel : ${formatNumber(estimatedRevenu.monthly)}\u00A0€)`;
+            estimatedRevenuElement.textContent = window.translationSystem.getTranslation("estimated-revenu-prefix") +
+                formatNumber(estimatedRevenu.yearly) + "€ (" +
+                window.translationSystem.getTranslation("monthly-option").toLowerCase() + ": " +
+                formatNumber(estimatedRevenu.monthly) + "€)";
         } else {
             const taxAmount = parseFloat(taxAmountInput.value);
             if (isNaN(taxAmount) || taxAmount <= 0) {
@@ -328,14 +343,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (taxAmount === 0) {
                 const maxRevenuNoTax = TAX_THRESHOLDS[1].min / (chargesType === "abattement" ? 0.9 : 1);
-                estimatedRevenuElement.textContent = `Avec 0€ d'impôt, votre revenu annuel est inférieur à ${formatNumber(maxRevenuNoTax)}\u00A0€ (${formatNumber(maxRevenuNoTax/12)}\u00A0€/mois).`;
+                estimatedRevenuElement.textContent = window.translationSystem.getTranslation("zero-tax-message",
+                    formatNumber(maxRevenuNoTax),
+                    formatNumber(maxRevenuNoTax/12));
                 return;
             }
 
             const taxType = taxTypeSelect.value;
             const yearlyTax = taxType === "monthly" ? taxAmount * 12 : taxAmount;
             const estimatedRevenu = estimateRevenuFromTax(yearlyTax, chargesType, fixedCharges);
-            estimatedRevenuElement.textContent = `Revenu annuel estimé : ${formatNumber(estimatedRevenu.yearly)}\u00A0€ (Mensuel : ${formatNumber(estimatedRevenu.monthly)}\u00A0€)`;
+            estimatedRevenuElement.textContent = window.translationSystem.getTranslation("estimated-revenu-prefix") +
+                formatNumber(estimatedRevenu.yearly) + "€ (" +
+                window.translationSystem.getTranslation("monthly-option").toLowerCase() + ": " +
+                formatNumber(estimatedRevenu.monthly) + "€)";
         }
     }
 
@@ -521,4 +541,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return formatNumber(tax);
     }
+
+    // Register functions with translation system
+    window.translationSystem.registerCalculationFunctions(calculateRevenuToImpot, calculateImpotToRevenu);
 });

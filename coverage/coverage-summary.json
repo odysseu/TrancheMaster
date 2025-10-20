@@ -1,0 +1,3 @@
+{"total": {"lines":{"total":73,"covered":54,"skipped":0,"pct":73.97},"statements":{"total":75,"covered":56,"skipped":0,"pct":74.66},"functions":{"total":6,"covered":5,"skipped":0,"pct":83.33},"branches":{"total":36,"covered":26,"skipped":0,"pct":72.22},"branchesTrue":{"total":0,"covered":0,"skipped":0,"pct":"Unknown"}}
+,"/workspaces/TrancheMaster/js/taxCalculator.js": {"lines":{"total":73,"covered":54,"skipped":0,"pct":73.97},"functions":{"total":6,"covered":5,"skipped":0,"pct":83.33},"statements":{"total":75,"covered":56,"skipped":0,"pct":74.66},"branches":{"total":36,"covered":26,"skipped":0,"pct":72.22}}
+}

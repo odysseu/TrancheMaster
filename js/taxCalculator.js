@@ -56,8 +56,8 @@ export function formatNumber(value) {
 export function calculateTax(taxableIncome) {
   let tax = 0;
   for (const threshold of TAX_THRESHOLDS) {
-    if (taxableIncome > threshold.min) {
-      const taxableAmount = Math.min(taxableIncome, threshold.max) - threshold.min;
+    if (taxableIncome >= threshold.min) {
+      const taxableAmount = Math.min(taxableIncome, threshold.max) - (threshold.min - 1);
       tax += taxableAmount * threshold.rate;
     }
   }

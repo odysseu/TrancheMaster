@@ -96,29 +96,30 @@ describe('Tax Calculation Functions', () => {
 
     describe('calculateTax', () => {
         it('should return 0 for income below first threshold', () => {
-            expect(calculateTax(10000)).toBe(0);
+            expect(calculateTax(0)).toBe(0);
+            expect(calculateTax(100)).toBe(0);
             expect(calculateTax(11497)).toBe(0);
         });
 
         it('should calculate correct tax for income in first taxable threshold', () => {
-            expect(calculateTax(11498)).toBe(0); // rounded 0.11 * (11498 - 11497)
-            expect(calculateTax(15000)).toBe(385.33); // (15000-11497)*0.11
-            expect(calculateTax(29315)).toBe(1935.05);
+            expect(calculateTax(11498)).toBe("0.11"); // rounded 0.11 * (11498 - 11497)
+            expect(calculateTax(15000)).toBe("385.33"); // (15000-11497)*0.11
+            expect(calculateTax(29315)).toBe("1959.98"); // (29315-11497)*0.11
         });
 
         it('should calculate correct tax for income in second threshold', () => {
-            expect(calculateTax(29316)).toBe(1935.17);
-            expect(calculateTax(50000)).toBe(5467.5);
+            expect(calculateTax(29316)).toBe("1960.28");
+            expect(calculateTax(50000)).toBe("8165.48");
         });
 
         it('should calculate correct tax for income in third threshold', () => {
-            expect(calculateTax(83824)).toBe(18081.59);
-            expect(calculateTax(100000)).toBe(25467.5);
+            expect(calculateTax(83824)).toBe("18312.79");
+            expect(calculateTax(100000)).toBe("24944.95");
         });
 
         it('should calculate correct tax for income in highest threshold', () => {
-            expect(calculateTax(180295)).toBe(58435.55);
-            expect(calculateTax(200000)).toBe(66435.5);
+            expect(calculateTax(180295)).toBe("57865.94");
+            expect(calculateTax(200000)).toBe("66733.19");
         });
     });
 

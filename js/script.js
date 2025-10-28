@@ -2,9 +2,8 @@
 import {
   TAX_THRESHOLDS,
   THRESHOLD_DATA,
-  calculateTax,
   calculateTaxWithBreakdown,
-  estimateRevenuFromTax,
+  calculateRevenuFromTaxValue,
   findThresholdForTaxPercentage,
   calculateRevenuFromTaxPercentage,
   formatNumber
@@ -12,10 +11,10 @@ import {
 
 // DOM elements
 let revenuInput, revenuTypeSelect, fixedChargesInput,
-    taxPercentageInput, taxAmountInput, taxTypeSelect, fixedChargesReverseInput,
-    taxPercentageElement, thresholdBreakdownElement, totalTaxElement, missingMoneyElement,
-    estimatedRevenuElement, abattementBtn, fixedChargesBtn, taxPercentageBtn, taxAmountBtn,
-    abattementReverseBtn, fixedChargesReverseBtn;
+  taxPercentageInput, taxAmountInput, taxTypeSelect, fixedChargesReverseInput,
+  taxPercentageElement, thresholdBreakdownElement, totalTaxElement, missingMoneyElement,
+  calculatedRevenuElement, abattementBtn, fixedChargesBtn, taxPercentageBtn, taxAmountBtn,
+  abattementReverseBtn, fixedChargesReverseBtn;
 
 // Initialize the application
 document.addEventListener("DOMContentLoaded", async () => {
@@ -55,7 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   thresholdBreakdownElement = document.getElementById("threshold-breakdown");
   totalTaxElement = document.getElementById("total-tax");
   missingMoneyElement = document.getElementById("missing-money");
-  estimatedRevenuElement = document.getElementById("estimated-revenu");
+  calculatedRevenuElement = document.getElementById("calculated-revenu");
 
   // Get menu buttons
   abattementBtn = document.getElementById("abattement-btn");
@@ -161,7 +160,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   fixedChargesReverseInput.addEventListener("input", calculateImpotToRevenu);
 
   // Revenu → Impôt logic
-  function calculateRevenuToImpot() {
+  function calculateRevenuToImpot() { // TODO : check that this takes net income to taxable income only once !
     const revenu = parseFloat(revenuInput.value);
     if (isNaN(revenu) || revenu <= 0) {
       taxPercentageElement.textContent = "";
@@ -170,24 +169,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       missingMoneyElement.textContent = "";
       return;
     }
-
     const revenuType = revenuTypeSelect.value;
     const yearlyRevenu = revenuType === "monthly" ? revenu * 12 : revenu;
-
     // Use the selected menu to determine the method
     const chargesType = abattementBtn.classList.contains("active") ? "abattement" : "fixed";
     const fixedCharges = chargesType === "fixed" ? parseFloat(fixedChargesInput.value) || 0 : 0;
-
     let taxableIncome;
     if (chargesType === "abattement") {
       taxableIncome = yearlyRevenu * 0.9;
     } else {
       taxableIncome = Math.max(0, yearlyRevenu - fixedCharges);
     }
-
     const { tax, breakdown } = calculateTaxWithBreakdown(taxableIncome);
     const taxPercentage = (tax / yearlyRevenu) * 100;
-
     // Display threshold breakdown
     thresholdBreakdownElement.innerHTML = "";
     breakdown.forEach(threshold => {
@@ -202,24 +196,23 @@ document.addEventListener("DOMContentLoaded", async () => {
       `;
       thresholdBreakdownElement.appendChild(row);
     });
-
-    const currentThreshold = TAX_THRESHOLDS.find(threshold =>
-      taxableIncome >= threshold.min && taxableIncome <= threshold.max
-    );
     const nextThreshold = TAX_THRESHOLDS.find(threshold =>
       taxableIncome < threshold.min
     );
-
     let missingMoneyYearly = nextThreshold ? nextThreshold.min - taxableIncome : 0;
     let missingMoneyMonthly = missingMoneyYearly / 12;
-
     taxPercentageElement.textContent = window.translationSystem.getTranslation("tax-percentage-prefix") + taxPercentage.toFixed(2) + "%";
     totalTaxElement.textContent = window.translationSystem.getTranslation("total-tax-prefix") + formatNumber(tax) + "€";
-
     if (tax === 0) {
-      missingMoneyElement.textContent = window.translationSystem.getTranslation("no-tax-complete",
+      missingMoneyElement.textContent = window.translationSystem.getTranslation(
+        "no-tax-complete",
         formatNumber(taxableIncome),
-        formatNumber(TAX_THRESHOLDS[1].min));
+        formatNumber(TAX_THRESHOLDS[1].min)
+      ) + window.translationSystem.getTranslation(
+        "missing-money-complete",
+        formatNumber(missingMoneyYearly),
+        formatNumber(missingMoneyMonthly)
+      ); // TODO
     } else if (!nextThreshold) {
       missingMoneyElement.textContent = window.translationSystem.getTranslation("max-contributor-message");
     } else {
@@ -236,63 +229,116 @@ document.addEventListener("DOMContentLoaded", async () => {
     const chargesType = abattementReverseBtn.classList.contains("active") ? "abattement" : "fixed";
     const fixedCharges = chargesType === "fixed" ? parseFloat(fixedChargesReverseInput.value) || 0 : 0;
 
+    // Clear previous breakdown
+    const thresholdBreakdownReverseBody = document.getElementById("threshold-breakdown-reverse-body");
+    thresholdBreakdownReverseBody.innerHTML = "";
+
     if (isTaxPercentageMode) {
       const taxPercentage = parseFloat(taxPercentageInput.value);
       if (isNaN(taxPercentage) || taxPercentage <= 0) {
-        estimatedRevenuElement.textContent = "";
+        calculatedRevenuElement.textContent = "";
         return;
       }
 
       // Check if tax percentage is above maximum
-      if (taxPercentage > 40.50) {
-        estimatedRevenuElement.textContent = window.translationSystem.getTranslation("tax-percentage-error");
+      if (taxPercentage > 40.50 && chargesType === "abattement") {
+        calculatedRevenuElement.textContent = window.translationSystem.getTranslation("tax-percentage-with-deduction-error");
+        return;
+      } else if (taxPercentage > 45 - 1E-15 && chargesType === "fixed") {
+        calculatedRevenuElement.textContent = window.translationSystem.getTranslation("tax-percentage-with-fixed-charges-error");
         return;
       }
 
       if (taxPercentage === 0) {
-        const maxRevenuNoTax = TAX_THRESHOLDS[1].min / (chargesType === "abattement" ? 0.9 : 1);
-        estimatedRevenuElement.textContent = window.translationSystem.getTranslation("zero-tax-message",
-          formatNumber(maxRevenuNoTax),
-          formatNumber(maxRevenuNoTax/12));
+        const maxRevenuNoTax = TAX_THRESHOLDS[0].max;
+        let calculatedRevenuNoTax;
+        if (chargesType === "abattement") {
+          calculatedRevenuNoTax = maxRevenuNoTax / 0.9;
+        } else {
+          calculatedRevenuNoTax = maxRevenuNoTax + fixedCharges;
+        }
+        calculatedRevenuElement.textContent = window.translationSystem.getTranslation("zero-tax-message",
+          formatNumber(calculatedRevenuNoTax),
+          formatNumber(calculatedRevenuNoTax / 12));
         return;
       }
 
       // Find the appropriate threshold for this tax percentage
-      const targetThreshold = findThresholdForTaxPercentage(taxPercentage);
-
-      if (!targetThreshold) {
-        estimatedRevenuElement.textContent = window.translationSystem.getTranslation("tax-percentage-error");
+      const { threshold, index } = findThresholdForTaxPercentage(taxPercentage);
+      if (!threshold) {
+        calculatedRevenuElement.textContent = window.translationSystem.getTranslation("tax-percentage-error");
         return;
       }
 
-      // Calculate estimated revenue based on the target threshold
-      const estimatedRevenu = calculateRevenuFromTaxPercentage(taxPercentage, chargesType, fixedCharges, targetThreshold);
-      estimatedRevenuElement.textContent = window.translationSystem.getTranslation("estimated-revenu-prefix") +
-        formatNumber(estimatedRevenu.yearly) + "€ (" +
+      // Calculate revenue based on the target threshold
+      const calculatedRevenu = calculateRevenuFromTaxPercentage(taxPercentage, chargesType, fixedCharges, { threshold, index });
+      calculatedRevenuElement.textContent = window.translationSystem.getTranslation("calculated-revenu-prefix") +
+        formatNumber(calculatedRevenu.yearly) + "€ (" +
         window.translationSystem.getTranslation("monthly-option").toLowerCase() + ": " +
-        formatNumber(estimatedRevenu.monthly) + "€)";
+        formatNumber(calculatedRevenu.monthly) + "€)";
+
+      // Calculate taxable income for breakdown
+      const taxableIncome = calculatedRevenu.yearly;
+      const { breakdown } = calculateTaxWithBreakdown(taxableIncome);
+
+      // Display threshold breakdown
+      let cumulativeTax = 0;
+      breakdown.forEach(threshold => {
+        const row = document.createElement("tr");
+        cumulativeTax += threshold.tax;
+        const formattedCumulativeTax = formatNumber(cumulativeTax);
+        row.innerHTML = `
+          <td>${formatNumber(threshold.min)}\u00A0-\u00A0${threshold.max === Infinity ? "+∞" : formatNumber(threshold.max)}</td>
+          <td>${formatNumber(threshold.taxableAmount)}</td>
+          <td>${(threshold.rate * 100).toFixed(2)}</td>
+          <td>${formatNumber(threshold.tax)}</td>
+          <td>${formattedCumulativeTax}</td>
+        `;
+        thresholdBreakdownReverseBody.appendChild(row);
+      });
     } else {
       const taxAmount = parseFloat(taxAmountInput.value);
       if (isNaN(taxAmount) || taxAmount <= 0) {
-        estimatedRevenuElement.textContent = "";
+        calculatedRevenuElement.textContent = "";
         return;
       }
 
       if (taxAmount === 0) {
         const maxRevenuNoTax = TAX_THRESHOLDS[1].min / (chargesType === "abattement" ? 0.9 : 1);
-        estimatedRevenuElement.textContent = window.translationSystem.getTranslation("zero-tax-message",
+        calculatedRevenuElement.textContent = window.translationSystem.getTranslation("zero-tax-message",
           formatNumber(maxRevenuNoTax),
-          formatNumber(maxRevenuNoTax/12));
+          formatNumber(maxRevenuNoTax / 12));
         return;
       }
 
       const taxType = taxTypeSelect.value;
       const yearlyTax = taxType === "monthly" ? taxAmount * 12 : taxAmount;
-      const estimatedRevenu = estimateRevenuFromTax(yearlyTax, chargesType, fixedCharges);
-      estimatedRevenuElement.textContent = window.translationSystem.getTranslation("estimated-revenu-prefix") +
-        formatNumber(estimatedRevenu.yearly) + "€ (" +
+      const calculatedRevenu = calculateRevenuFromTaxValue(yearlyTax, chargesType, fixedCharges);
+
+      // Calculate taxable income for breakdown
+      const taxableIncome = chargesType === "abattement" ? calculatedRevenu.yearly * 0.9 : calculatedRevenu.yearly - fixedCharges;
+      const { breakdown } = calculateTaxWithBreakdown(taxableIncome);
+
+      // Display threshold breakdown
+      let cumulativeTax = 0;
+      breakdown.forEach(threshold => {
+        const row = document.createElement("tr");
+        cumulativeTax += threshold.tax;
+        const formattedCumulativeTax = formatNumber(cumulativeTax);
+        row.innerHTML = `
+          <td>${formatNumber(threshold.min)}\u00A0-\u00A0${threshold.max === Infinity ? "+∞" : formatNumber(threshold.max)}</td>
+          <td>${formatNumber(threshold.taxableAmount)}</td>
+          <td>${(threshold.rate * 100).toFixed(2)}</td>
+          <td>${formatNumber(threshold.tax)}</td>
+          <td>${formattedCumulativeTax}</td>
+        `;
+        thresholdBreakdownReverseBody.appendChild(row);
+      });
+
+      calculatedRevenuElement.textContent = window.translationSystem.getTranslation("calculated-revenu-prefix") +
+        formatNumber(calculatedRevenu.yearly) + "€ (" +
         window.translationSystem.getTranslation("monthly-option").toLowerCase() + ": " +
-        formatNumber(estimatedRevenu.monthly) + "€)";
+        formatNumber(calculatedRevenu.monthly) + "€)";
     }
   }
 

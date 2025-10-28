@@ -39,15 +39,14 @@
             <button id="revenu-to-impot-btn" class="menu-btn active" data-i18n="revenu-to-impot-btn">Revenu → Impôt</button>
             <button id="impot-to-revenu-btn" class="menu-btn" data-i18n="impot-to-revenu-btn">Impôt → Revenu</button>
         </div>
-
         <!-- Revenu → Impôt section -->
         <div id="revenu-to-impot-section" class="section active">
             <div class="input-group">
-                <label for="revenu" data-i18n="revenu-label">Revenu (€) :</label>
+                <label for="revenu" data-i18n="revenu-label">Revenu (€)&nbsp:</label>
                 <input type="number" id="revenu" placeholder data-i18n-placeholder="revenu-placeholder" inputmode="decimal" step="0.01">
             </div>
             <div class="input-group">
-                <label for="revenu-type" data-i18n="revenu-type-label">Type de revenu :</label>
+                <label for="revenu-type" data-i18n="revenu-type-label">Type de revenu&nbsp:</label>
                 <select id="revenu-type">
                     <option value="yearly" data-i18n="yearly-option">Annuel</option>
                     <option value="monthly" data-i18n="monthly-option">Mensuel</option>
@@ -55,11 +54,10 @@
             </div>
             <!-- Menu for 10% or charges -->
             <div class="menu">
-                <button id="abattement-btn" class="menu-btn active" data-i18n="abattement-btn">Abattement 10%</button>
-                <button id="fixed-charges-btn" class="menu-btn" data-i18n="fixed-charges-btn">Frais réels (€)</button>
+                <button id="abattement-btn" class="menu-btn active" data-i18n="abattement-btn">Abattement (10%)</button>
+                <button id="fixed-charges-btn" class="menu-btn" data-i18n="fixed-charges-btn">Frais réels&nbsp(€)</button>
             </div>
             <div class="input-group" id="fixed-charges-group" style="display: none;">
-                <label for="fixed-charges" data-i18n="fixed-charges-label">Frais réels (€) :</label>
                 <input type="number" id="fixed-charges" placeholder data-i18n-placeholder="fixed-charges-placeholder" inputmode="decimal" step="0.01">
             </div>
             <div class="results">
@@ -69,9 +67,9 @@
                     <thead>
                         <tr>
                             <th data-i18n="threshold-column">Tranche</th>
-                            <th data-i18n="taxable-amount-column">Montant imposable (€)</th>
-                            <th data-i18n="rate-column">Taux (%)</th>
-                            <th data-i18n="tax-column">Impôt (€)</th>
+                            <th data-i18n="taxable-amount-column">Montant imposable&nbsp(€)</th>
+                            <th data-i18n="rate-column">Taux&nbsp(%)</th>
+                            <th data-i18n="tax-column">Impôt&nbsp(€)</th>
                         </tr>
                     </thead>
                     <tbody id="threshold-breakdown">
@@ -82,24 +80,20 @@
                 <p id="missing-money" data-i18n-prefix="missing-money-prefix"></p>
             </div>
         </div>
-
         <!-- Impôt → Revenu section -->
         <div id="impot-to-revenu-section" class="section">
             <!-- Menu for percentage or value -->
             <div class="menu">
-                <button id="tax-percentage-btn" class="menu-btn active" data-i18n="tax-percentage-btn">Pourcentage d'imposition (%)</button>
-                <button id="tax-amount-btn" class="menu-btn" data-i18n="tax-amount-btn">Montant de l'impôt (€)</button>
+                <button id="tax-percentage-btn" class="menu-btn active" data-i18n="tax-percentage-btn">Pourcentage d'imposition&nbsp(%)</button>
+                <button id="tax-amount-btn" class="menu-btn" data-i18n="tax-amount-btn">Montant de l'impôt&nbsp(€)</button>
             </div>
             <div class="input-group" id="tax-percentage-group">
-                <label for="tax-percentage-input" data-i18n="tax-percentage-label">Pourcentage d'imposition (%) :</label>
                 <input type="number" id="tax-percentage-input" inputmode="decimal" step="0.01" placeholder data-i18n-placeholder="tax-percentage-placeholder">
             </div>
             <div class="input-group tax-type-group hidden" id="tax-amount-group">
-                <label for="tax-amount" data-i18n="tax-amount-label">Montant de l'impôt (€) :</label>
                 <input type="number" id="tax-amount" inputmode="decimal" step="0.01" placeholder data-i18n-placeholder="tax-amount-placeholder">
             </div>
             <div class="input-group tax-type-group hidden" id="tax-type-group">
-                <label for="tax-type" data-i18n="tax-type-label">Type de montant :</label>
                 <select id="tax-type">
                     <option value="yearly" data-i18n="yearly-option">Annuel</option>
                     <option value="monthly" data-i18n="monthly-option">Mensuel</option>
@@ -107,16 +101,31 @@
             </div>
             <!-- Menu for 10% or charges -->
             <div class="menu">
-                <button id="abattement-reverse-btn" class="menu-btn active" data-i18n="abattement-reverse-btn">Abattement 10%</button>
-                <button id="fixed-charges-reverse-btn" class="menu-btn" data-i18n="fixed-charges-reverse-btn">Frais réels (€)</button>
+                <button id="abattement-reverse-btn" class="menu-btn active" data-i18n="abattement-reverse-btn">Abattement&nbsp(10%)</button>
+                <button id="fixed-charges-reverse-btn" class="menu-btn" data-i18n="fixed-charges-reverse-btn">Frais réels&nbsp(€)</button>
             </div>
             <div class="input-group" id="fixed-charges-group-reverse" style="display: none;">
-                <label for="fixed-charges-reverse" data-i18n="fixed-charges-reverse-label">Frais réels (€) :</label>
+                <label for="fixed-charges-reverse" data-i18n="fixed-charges-reverse-label">Frais réels&nbsp(€) :</label>
                 <input type="number" id="fixed-charges-reverse" inputmode="decimal" step="0.01" placeholder data-i18n-placeholder="fixed-charges-reverse-placeholder">
             </div>
             <div class="results">
                 <h2 data-i18n="results-title">Résultats</h2>
-                <p id="estimated-revenu" data-i18n-prefix="estimated-revenu-prefix"></p>
+                <p id="calculated-revenu" data-i18n-prefix="calculated-revenu-prefix"></p>
+                <!-- Added table for threshold breakdown -->
+                <table class="threshold-table" id="threshold-breakdown-reverse">
+                    <thead>
+                        <tr>
+                            <th data-i18n="threshold-column">Tranche</th>
+                            <th data-i18n="taxable-amount-column">Montant imposable (€)</th>
+                            <th data-i18n="rate-column">Taux (%)</th>
+                            <th data-i18n="tax-column">Impôt (€)</th>
+                            <th data-i18n="cumulative-tax-column">Impôt cumulé (€)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="threshold-breakdown-reverse-body">
+                        <!-- Filled by JavaScript -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

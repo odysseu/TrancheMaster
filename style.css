@@ -36,7 +36,6 @@
     --header-left-logo: 40px;
     --header-right-height: 24px;
 }
-
 body {
     /* Default: Light mode */
     --bg-color: var(--light-bg-color);
@@ -60,7 +59,6 @@ body {
     width: calc(100% - 10px);
     transition: background-color 0.3s, color 0.3s;
 }
-
 body.dark-mode {
     /* Dark mode overrides */
     --bg-color: var(--dark-bg-color);
@@ -78,7 +76,6 @@ body.dark-mode {
     --language-select-border: var(--language-select-border-dark);
     --language-select-arrow: var(--language-select-arrow-dark);
 }
-
 /* Slider styles */
 .switch {
     display: inline-block;
@@ -86,13 +83,11 @@ body.dark-mode {
     height: var(--header-right-height);
     position: relative;
 }
-
 .switch input {
     opacity: 0;
     width: 0;
     height: 0;
 }
-
 .slider {
     position: absolute;
     cursor: pointer;
@@ -104,7 +99,6 @@ body.dark-mode {
     transition: 0.4s;
     border-radius: 24px;
 }
-
 .slider:before {
     position: absolute;
     content: "";
@@ -116,15 +110,12 @@ body.dark-mode {
     transition: 0.4s;
     border-radius: 50%;
 }
-
 input:checked + .slider {
     background-color: var(--primary-color);
 }
-
 input:checked + .slider:before {
     transform: translateX(26px);
 }
-
 /* Header styles */
 .sticky-header {
     background-color: var(--bg-color);
@@ -139,25 +130,21 @@ input:checked + .slider:before {
     justify-content: space-between;
     gap: 10px;
 }
-
 .sticky-header h1 {
     margin: 0;
     font-size: large;
     text-align: center;
 }
-
 /* Header right container styling */
 .header-right {
     display: flex;
     align-items: center;
     gap: 15px;
 }
-
 /* Language Selector Styles */
 .language-selector-container {
     position: relative;
 }
-
 #language-select {
     margin-top: 0px;
     padding: 6px 12px;
@@ -179,30 +166,25 @@ input:checked + .slider:before {
     height: var(--header-right-height) + 6px;
     transition: all 0.3s ease;
 }
-
 #language-select:focus {
     outline: none;
     box-shadow: 0 0 0 2px var(--primary-color);
     border-color: var(--primary-color);
 }
-
 #language-select option {
     background-color: var(--bg-color);
     color: var(--text-color);
 }
-
 /* Add hover effect */
 #language-select:hover {
     background-color: var(--button-background);
 }
-
 /* Menu styles */
 .menu {
     display: flex;
     margin-bottom: 15px;
     border-bottom: 1px solid var(--border-color);
 }
-
 .menu-btn {
     flex: 1;
     padding: 10px;
@@ -213,22 +195,18 @@ input:checked + .slider:before {
     color: var(--text-color);
     border-bottom: 2px solid transparent;
 }
-
 .menu-btn.active {
     border-bottom: 2px solid var(--primary-color);
 }
-
 /* Input and button styles */
 .input-group {
     margin-bottom: 15px;
 }
-
 .input-group label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
 }
-
 select, button {
     width: 100%;
     padding: 8px;
@@ -239,7 +217,6 @@ select, button {
     background-color: var(--bg-color);
     color: var(--text-color);
 }
-
 input {
     width: 100%;
     padding: 8px;
@@ -250,18 +227,15 @@ input {
     background-color: var(--input-background);
     color: var(--text-color);
 }
-
 button {
     background-color: var(--button-background);
     border: 1px solid var(--border-color);
     cursor: pointer;
     font-weight: bold;
 }
-
 button:hover {
     background-color: var(--primary-hover-color);
 }
-
 /* Container styles */
 .container {
     max-width: 600px;
@@ -271,16 +245,13 @@ button:hover {
     border: 1px solid var(--border-color);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 /* Section styles */
 .section {
     display: none;
 }
-
 .section.active {
     display: block;
 }
-
 /* Results section */
 .results {
     margin-top: 20px;
@@ -289,11 +260,9 @@ button:hover {
     border-radius: 4px;
     background-color: var(--bg-color);
 }
-
 .results h2 {
     margin-top: 0;
 }
-
 /* Threshold table styles */
 .threshold-table {
     width: 100%;
@@ -301,52 +270,42 @@ button:hover {
     margin-top: 15px;
     font-size: 0.9em;
 }
-
 .threshold-table th {
     background-color: var(--table-header-bg);
     color: var(--table-header-text);
     padding: 8px;
     text-align: left;
 }
-
 .threshold-table td {
     padding: 8px;
     text-align: right;
     border-bottom: 1px solid var(--border-color);
 }
-
 .threshold-table tr:nth-child(even) {
     background-color: var(--table-even-row-color);
 }
-
 .threshold-table tr:hover {
     background-color: var(--table-hover-row-color);
 }
-
 .threshold-table td:first-child {
     text-align: left;
 }
-
 /* Tax type group */
 .tax-type-group {
     display: block;
 }
-
 .tax-type-group.hidden {
     display: none;
 }
-
 .header-left .header-logo {
     max-height: var(--header-left-logo);
     cursor: pointer;
 }
-
 /* Custom dropdown styling for language selector */
 @media (max-width: 480px) {
     .header-right {
         gap: 10px;
     }
-
     #language-select {
         min-width: 110px;
         padding: 6px 8px;

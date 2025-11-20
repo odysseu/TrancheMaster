@@ -33,12 +33,12 @@
   "fixed-charges-reverse-label": "Frais réels\u00A0(€)\u00A0:",
   "fixed-charges-reverse-placeholder": "Entrez vos frais réels",
   "calculated-revenu-prefix": "Revenu annuel calculé\u00A0: ",
-  "no-tax-message": "Avec un revenu imposable de {0}€, vous ne payez pas d'impôt. Vous êtes sous le premier seuil d'imposition ({1}€).",
+  "no-tax-message": "Avec un revenu imposable de {0}€, vous ne payez pas d'impôt. Vous êtes sous le premier seuil d'imposition\u00A0({1}€).",
   "max-contributor-message": "Vous êtes un grand contributeur ! Vous avez dépassé la dernière tranche d'imposition.",
   "missing-money-complete": "Il manque {0}€ par an ({1}€ par mois) pour atteindre la prochaine tranche.",
   "tax-percentage-error": "Le pourcentage d'imposition ne peut pas dépasser 45\u00A0%. Veuillez entrer une valeur valide.",
   "tax-percentage-with-deduction-error" : "Le pourcentage d'imposition ne peut pas dépasser 40,50\u00A0% avec l'abattement. Veuillez entrer une valeur valide.",
   "tax-percentage-with-fixed-charges-error" : "Le pourcentage d'imposition ne peut pas dépasser 45\u00A0% avec les charges fixes. Veuillez entrer une valeur valide.",
-  "no-tax-complete": "Avec des revenus imposables de {0}€, vous ne payez aucun impôt. Votre revenu se trouve en dessous du sueil de la deuxième tranche (situé à {1}€).",
-  "zero-tax-message": "Avec 0% d'imposition, votre revenu annuel est inférieur à {0}€ ({1}€/mois)."
+  "no-tax-complete": "Avec des revenus imposables de {0}€, vous ne payez aucun impôt. Votre revenu se trouve en dessous du sueil de la deuxième tranche (situé à\u00A0{1}€).",
+  "zero-tax-message": "Avec 0% d'imposition, votre revenu annuel est inférieur à {0}€\u00A0({1}€/mois)."
 }

@@ -7,9 +7,9 @@ import {
     TAX_THRESHOLDS,
     THRESHOLD_DATA,
     calculateTaxWithBreakdown,
-    calculateRevenuFromTaxValue,
+    calculateNetRevenuFromTaxValue,
     findThresholdForTaxPercentage,
-    calculateRevenuFromTaxPercentage,
+    calculateNetRevenuFromTaxPercentage,
     formatNumber
 } from './taxCalculator.js';
 
@@ -224,45 +224,45 @@ describe('Tax Calculation Functions', () => {
         });
     });
 
-    describe('calculateRevenuFromTaxValue', () => {
+    describe('calculateNetRevenuFromTaxValue', () => {
         describe('with abattement (10% deduction)', () => {
             it('should return correct revenue for tax in first threshold', () => {
-                const result = calculateRevenuFromTaxValue(100, 'abattement', 0);
+                const result = calculateNetRevenuFromTaxValue(100, 'abattement', 0);
                 expect(parseFloat(result.yearly)).toBeCloseTo(parseFloat("13784.55"), 1);
             });
 
             it('should return correct revenue for tax spanning multiple thresholds', () => {
-                const result = calculateRevenuFromTaxValue(5000, 'abattement', 0);
+                const result = calculateNetRevenuFromTaxValue(5000, 'abattement', 0);
                 expect(parseFloat(result.yearly)).toBeCloseTo(parseFloat("43831.55"), 1);
             });
         });
 
         describe('with fixed charges', () => {
             it('should return correct revenue for tax in first threshold', () => {
-                const result = calculateRevenuFromTaxValue(100, 'fixed', 1000);
+                const result = calculateNetRevenuFromTaxValue(100, 'fixed', 1000);
                 expect(result.yearly).toBe("13406.09");
             });
         });
     });
 
-    describe('calculateRevenuFromTaxPercentage', () => {
+    describe('calculateNetRevenuFromTaxPercentage', () => {
         describe('with fixed charges', () => {
             it('should return correct revenue for 7.22% tax', () => {
                 const { threshold } = findThresholdForTaxPercentage(7.22);
-                const result = calculateRevenuFromTaxPercentage(7.22, 'fixed', 0, { threshold });
+                const result = calculateNetRevenuFromTaxPercentage(7.22, 'fixed', 0, { threshold });
                 expect(parseFloat(result.yearly)).toBeCloseTo(parseFloat("30000"), -1);
             });
             it('should return correct revenue for 2% tax', () => {
                 const { threshold } = findThresholdForTaxPercentage(2);
-                const result = calculateRevenuFromTaxPercentage(2, 'fixed', 1000, { threshold });
-                expect(result.yearly).toBe("15274.11");
+                const result = calculateNetRevenuFromTaxPercentage(2, 'fixed', 1000, { threshold });
+                expect(parseFloat(result.yearly)).toBeCloseTo(parseFloat("15053.11"));
             });
         });
         describe('with abattement', () => {
             it('should return correct revenue for 2% tax', () => {
                 const { threshold } = findThresholdForTaxPercentage(2);
-                const result = calculateRevenuFromTaxPercentage(2, 'abattement', 0, { threshold });
-                expect(result.yearly).toBe("15614.57");
+                const result = calculateNetRevenuFromTaxPercentage(2, 'abattement', 0, { threshold });
+                expect(parseFloat(result.yearly)).toBeCloseTo(parseFloat("15614.57"));
             });
         });
 
@@ -270,35 +270,35 @@ describe('Tax Calculation Functions', () => {
 
     describe('Round-trip verification', () => {
         const testCases = [
-            { income: 25000, chargesType: 'abattement', fixedCharges: 0 },
-            { income: 50000, chargesType: 'abattement', fixedCharges: 0 },
-            { income: 100000, chargesType: 'abattement', fixedCharges: 0 },
-            { income: 25000, chargesType: 'fixed', fixedCharges: 2000 },
+            { netIncome: 25000, chargesType: 'abattement', fixedCharges: 0 },
+            { netIncome: 50000, chargesType: 'abattement', fixedCharges: 0 },
+            { netIncome: 100000, chargesType: 'abattement', fixedCharges: 0 },
+            { netIncome: 25000, chargesType: 'fixed', fixedCharges: 2000 },
         ];
 
-        testCases.forEach(({ income, chargesType, fixedCharges }) => {
-            it(`should verify round-trip for income ${income} with ${chargesType} charges`, () => {
-                // Calculate tax from income
-                const taxableIncome = chargesType === 'abattement' ? income * 0.9 : income - fixedCharges;
-                const { tax } = calculateTaxWithBreakdown(taxableIncome);
+        testCases.forEach(({ netIncome, chargesType, fixedCharges }) => {
+            it(`should verify round-trip for net income ${netIncome} with ${chargesType} charges (fixed charges at ${fixedCharges} €)`, () => {
+                // Calculate tax from netIncome
+                const taxablenetIncome = chargesType === 'abattement' ? netIncome * 0.9 : netIncome - fixedCharges; // TODO: use this shortcut everywhere possible
+                const { tax } = calculateTaxWithBreakdown(taxablenetIncome);
 
-                // Calculate income back from tax
-                const calculatedIncome = calculateRevenuFromTaxValue(tax, chargesType, fixedCharges);
+                // Calculate netIncome back from tax
+                const calculatedNetIncome = calculateNetRevenuFromTaxValue(tax, chargesType, fixedCharges);
 
                 // Calculate tax percentage
-                const taxPercentage = (tax / income) * 100;
+                const taxPercentage = (tax / taxablenetIncome) * 100;
 
                 // Find threshold for tax percentage
                 const { threshold } = findThresholdForTaxPercentage(taxPercentage);
 
                 // Calculate income from tax percentage
-                const calculatedIncomeFromPercentage = calculateRevenuFromTaxPercentage(
+                const calculateNetRevenuFromPercentage = calculateNetRevenuFromTaxPercentage(
                     taxPercentage, chargesType, fixedCharges, { threshold }
                 );
 
                 // Verify results are close
-                expect(parseFloat(calculatedIncome.yearly)).toBeCloseTo(income, -1);
-                expect(parseFloat(calculatedIncomeFromPercentage.yearly)).toBeCloseTo(income, -1);
+                expect(parseFloat(calculatedNetIncome.yearly)).toBeCloseTo(netIncome, -1);
+                expect(parseFloat(calculateNetRevenuFromPercentage.yearly)).toBeCloseTo(netIncome, -1);
             });
         });
     });

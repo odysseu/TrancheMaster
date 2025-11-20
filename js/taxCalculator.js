@@ -72,14 +72,14 @@ export function findThresholdForTaxPercentage(taxPercentage) {
   for (let i = 0; i < THRESHOLD_DATA.length; i++) {
     const threshold = THRESHOLD_DATA[i];
     if (taxPercentage >= threshold.minTaxPercentage && taxPercentage <= threshold.maxTaxPercentage) {
-      return { threshold, index: i };
+      return { threshold }; // , index: i
     }
   }
-  return { threshold: null, index: -1 };
+  return { threshold: null }; // , index: -1
 }
 
 // Calculate revenue from tax amount
-export function calculateRevenuFromTaxValue(taxAmount, chargesType, fixedCharges) {
+export function calculateNetRevenuFromTaxValue(taxAmount, chargesType, fixedCharges) {
   // If tax is 0, return the maximum revenue for 0% tax
   let taxableIncome;
   if (taxAmount === 0) {
@@ -102,20 +102,20 @@ export function calculateRevenuFromTaxValue(taxAmount, chargesType, fixedCharges
     taxableIncome = targetThreshold.min - 1 + (taxInThreshold / targetThreshold.rate);
   }
   // Calculate revenue based on charges type
-  let calculatedRevenu;
+  let calculatedNetIncome;
   if (chargesType === "abattement") {
-    calculatedRevenu = taxableIncome / 0.9;
+    calculatedNetIncome = taxableIncome / 0.9;
   } else {
-    calculatedRevenu = taxableIncome + fixedCharges;
+    calculatedNetIncome = taxableIncome + fixedCharges;
   }
   return {
-    yearly: formatNumber(calculatedRevenu),
-    monthly: formatNumber(calculatedRevenu / 12)
+    yearly: formatNumber(calculatedNetIncome),
+    monthly: formatNumber(calculatedNetIncome / 12)
   };
 }
 
 // Calculate revenue from tax percentage using precise formula
-export function calculateRevenuFromTaxPercentage(taxPercentage, chargesType, fixedCharges, { threshold }) {
+export function calculateNetRevenuFromTaxPercentage(taxPercentage, chargesType, fixedCharges, { threshold }) {
   const taxRate = taxPercentage / 100;
   let taxableIncome;
   if (taxPercentage === 0) {
@@ -139,14 +139,14 @@ export function calculateRevenuFromTaxPercentage(taxPercentage, chargesType, fix
     const denominator = taxRate - threshold.rate;
     taxableIncome = numerator / denominator;
   }
-  let calculatedRevenu;
+  let calculatedNetIncome;
   if (chargesType === "abattement") {
-    calculatedRevenu = taxableIncome / 0.9;
+    calculatedNetIncome = taxableIncome / 0.9;
   } else {
-    calculatedRevenu = taxableIncome + fixedCharges;
+    calculatedNetIncome = taxableIncome + fixedCharges;
   }
   return {
-    yearly: formatNumber(calculatedRevenu),
-    monthly: formatNumber(calculatedRevenu / 12)
+    yearly: formatNumber(calculatedNetIncome),
+    monthly: formatNumber(calculatedNetIncome / 12)
   };
 }

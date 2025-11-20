@@ -3,9 +3,9 @@ import {
   TAX_THRESHOLDS,
   THRESHOLD_DATA,
   calculateTaxWithBreakdown,
-  calculateRevenuFromTaxValue,
+  calculateNetRevenuFromTaxValue,
   findThresholdForTaxPercentage,
-  calculateRevenuFromTaxPercentage,
+  calculateNetRevenuFromTaxPercentage,
   formatNumber
 } from './taxCalculator.js';
 
@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   fixedChargesReverseInput.addEventListener("input", calculateImpotToRevenu);
 
   // Revenu → Impôt logic
-  function calculateRevenuToImpot() { // TODO : check that this takes net income to taxable income only once !
+  function calculateRevenuToImpot() {
     const revenu = parseFloat(revenuInput.value);
     if (isNaN(revenu) || revenu <= 0) {
       taxPercentageElement.textContent = "";
@@ -176,12 +176,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const fixedCharges = chargesType === "fixed" ? parseFloat(fixedChargesInput.value) || 0 : 0;
     let taxableIncome;
     if (chargesType === "abattement") {
-      taxableIncome = yearlyRevenu * 0.9;
+      taxableIncome = Math.max(0, yearlyRevenu * 0.9);
     } else {
       taxableIncome = Math.max(0, yearlyRevenu - fixedCharges);
     }
     const { tax, breakdown } = calculateTaxWithBreakdown(taxableIncome);
-    const taxPercentage = (tax / yearlyRevenu) * 100;
+    const taxPercentage = taxableIncome === 0 ? 0 : (tax / taxableIncome) * 100;
     // Display threshold breakdown
     thresholdBreakdownElement.innerHTML = "";
     breakdown.forEach(threshold => {
@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
     let missingMoneyYearly = nextThreshold ? nextThreshold.min - taxableIncome : 0;
     let missingMoneyMonthly = missingMoneyYearly / 12;
-    taxPercentageElement.textContent = window.translationSystem.getTranslation("tax-percentage-prefix") + taxPercentage.toFixed(2) + "%";
+    taxPercentageElement.textContent = window.translationSystem.getTranslation("tax-percentage-prefix") + taxPercentage.toFixed(3) + "%";
     totalTaxElement.textContent = window.translationSystem.getTranslation("total-tax-prefix") + formatNumber(tax) + "€";
     if (tax === 0) {
       missingMoneyElement.textContent = window.translationSystem.getTranslation(
@@ -264,21 +264,26 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // Find the appropriate threshold for this tax percentage
-      const { threshold, index } = findThresholdForTaxPercentage(taxPercentage);
+      const { threshold } = findThresholdForTaxPercentage(taxPercentage); // , index
       if (!threshold) {
         calculatedRevenuElement.textContent = window.translationSystem.getTranslation("tax-percentage-error");
         return;
       }
 
       // Calculate revenue based on the target threshold
-      const calculatedRevenu = calculateRevenuFromTaxPercentage(taxPercentage, chargesType, fixedCharges, { threshold, index });
+      const calculatedNetIncome = calculateNetRevenuFromTaxPercentage(taxPercentage, chargesType, fixedCharges, { threshold });
       calculatedRevenuElement.textContent = window.translationSystem.getTranslation("calculated-revenu-prefix") +
-        formatNumber(calculatedRevenu.yearly) + "€ (" +
+        formatNumber(calculatedNetIncome.yearly) + "€ (" +
         window.translationSystem.getTranslation("monthly-option").toLowerCase() + ": " +
-        formatNumber(calculatedRevenu.monthly) + "€)";
+        formatNumber(calculatedNetIncome.monthly) + "€)";
 
       // Calculate taxable income for breakdown
-      const taxableIncome = calculatedRevenu.yearly;
+      let taxableIncome;
+      if (chargesType === "abattement") {
+        taxableIncome = Math.max(0, calculatedNetIncome.yearly * 0.9);
+      } else {
+        taxableIncome = Math.max(0, calculatedNetIncome.yearly - fixedCharges);
+      }
       const { breakdown } = calculateTaxWithBreakdown(taxableIncome);
 
       // Display threshold breakdown
@@ -296,7 +301,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         `;
         thresholdBreakdownReverseBody.appendChild(row);
       });
-    } else {
+    } else { // not isTaxPercentageMode
       const taxAmount = parseFloat(taxAmountInput.value);
       if (isNaN(taxAmount) || taxAmount <= 0) {
         calculatedRevenuElement.textContent = "";
@@ -304,19 +309,30 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       if (taxAmount === 0) {
-        const maxRevenuNoTax = TAX_THRESHOLDS[1].min / (chargesType === "abattement" ? 0.9 : 1);
+        const maxRevenuNoTax = TAX_THRESHOLDS[0].max;
+        let calculatedRevenuNoTax;
+        if (chargesType === "abattement") {
+          calculatedRevenuNoTax = maxRevenuNoTax / 0.9;
+        } else {
+          calculatedRevenuNoTax = maxRevenuNoTax + fixedCharges;
+        }
         calculatedRevenuElement.textContent = window.translationSystem.getTranslation("zero-tax-message",
-          formatNumber(maxRevenuNoTax),
-          formatNumber(maxRevenuNoTax / 12));
+          formatNumber(calculatedRevenuNoTax),
+          formatNumber(calculatedRevenuNoTax / 12));
         return;
       }
 
       const taxType = taxTypeSelect.value;
       const yearlyTax = taxType === "monthly" ? taxAmount * 12 : taxAmount;
-      const calculatedRevenu = calculateRevenuFromTaxValue(yearlyTax, chargesType, fixedCharges);
+      const calculatedNetIncome = calculateNetRevenuFromTaxValue(yearlyTax, chargesType, fixedCharges);
 
       // Calculate taxable income for breakdown
-      const taxableIncome = chargesType === "abattement" ? calculatedRevenu.yearly * 0.9 : calculatedRevenu.yearly - fixedCharges;
+      let taxableIncome;
+      if (chargesType === "abattement") {
+        taxableIncome = calculatedNetIncome.yearly * 0.9;
+      } else {
+        taxableIncome = Math.max(0, calculatedNetIncome.yearly - fixedCharges);
+      }
       const { breakdown } = calculateTaxWithBreakdown(taxableIncome);
 
       // Display threshold breakdown
@@ -336,9 +352,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
 
       calculatedRevenuElement.textContent = window.translationSystem.getTranslation("calculated-revenu-prefix") +
-        formatNumber(calculatedRevenu.yearly) + "€ (" +
+        formatNumber(calculatedNetIncome.yearly) + "€ (" +
         window.translationSystem.getTranslation("monthly-option").toLowerCase() + ": " +
-        formatNumber(calculatedRevenu.monthly) + "€)";
+        formatNumber(calculatedNetIncome.monthly) + "€)";
     }
   }
 

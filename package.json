@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "test": "jest --coverage --silent"
+    "test": "jest --coverage --silent && jest-coverage-badges --input coverage/coverage-summary.json --output ./badges_output"
   },
   "jest": {
     "testEnvironment": "jsdom",
@@ -26,6 +26,23 @@
     "@babel/preset-env": "^7.28.3",
     "babel-jest": "^30.2.0",
     "jest": "^30.2.0",
-    "jest-environment-jsdom": "^30.2.0"
+    "jest-coverage-badges": "^1.1.2",
+    "jest-environment-jsdom": "^30.2.0",
+    "js-coverage-badges": "^1.1.1",
+    "nyc": "^17.1.0"
+  },
+  "nyc": {
+    "extension": [
+      ".js"
+    ],
+    "reporter": [
+      "json-summary",
+      "lcov",
+      "text"
+    ],
+    "include": [
+      "src"
+    ],
+    "exclude": "**/*.mock.js"
   }
 }

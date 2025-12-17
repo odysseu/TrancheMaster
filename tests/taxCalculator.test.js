@@ -11,7 +11,7 @@ import {
     findThresholdForTaxPercentage,
     calculateNetRevenuFromTaxPercentage,
     formatNumber
-} from './taxCalculator.js';
+} from '../js/taxCalculator.js';
 
 describe('Tax Calculation Functions', () => {
     let container;

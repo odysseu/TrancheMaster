@@ -75,7 +75,9 @@ If you're using codespace, for exemple the URL could be `https://fictional-somet
 
 **Test Coverage :**
 
-![Lines](./badges_output/badge_lines.svg) ![Statements](./badges_output/badge_statements.svg)  ![Branches](./badges_output/badge_branches.svg)  ![Functions](./badges_output/badge_functions.svg)
+![Lines](./badges_output/lines_chart.svg) ![Statements](./badges_output/statements_chart.svg)  ![Branches](./badges_output/branches_chart.svg)  ![Functions](./badges_output/functions_chart.svg)
+
+Special thanks to [js-coverage-badges](https://github.com/marialuisacp/js-coverage-badges) !
 
 ### Prerequisites
 

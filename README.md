@@ -1,41 +1,56 @@
 
 # TrancheMaster
 
-Calculator for _Impôt sur le Revenu_ (_IR_), the French income tax.
+**Calculator for *Impôt sur le Revenu* (IR), the French income tax.**
 
-This simulator helps you determine your tax threshold based on your income, and vice versa, using the official 2025 tax brackets as published on [the official website](https://www.service-public.gouv.fr/particuliers/actualites/A18045). For more advanced simulations, you can also use [the official simulator](https://simulateur-ir-ifi.impots.gouv.fr/calcul_impot/2025/) for any more advanced simulation.
+TrancheMaster helps you determine your tax bracket based on your income, or estimate the income required to reach a specific tax threshold. It uses the **official 2025 tax brackets** as published on [service-public.fr](https://www.service-public.fr/particuliers/actualites/A18045). For advanced simulations, you can also use [the official simulator](https://simulateur-ir-ifi.impots.gouv.fr/calcul_impot/2025/).
 
 ## Description 🤔
 
 <details open>
   <summary>🇬🇧 English</summary>
   Welcome!
-  **TrancheMaster** is a calculator for the French income tax (Impôt sur le Revenu). It allows you to determine your tax bracket based on your income, or estimate the income corresponding to a specific tax threshold. The simulator uses the official 2025 tax brackets to provide accurate results. Whether you're planning your finances or just curious, TrancheMaster helps you understand your <followup encodedFollowup="%7B%22id%22%3A%222ad6ce80-b134-4f54-a457-39e8ce82f2b9%22%2C%22snippet%22%3A%22tax%20obligations%20clearly%20and%20quickly%22%2C%22question%22%3A%22How%20does%20TrancheMaster%20simplify%20the%20process%20of%20understanding%20tax%20obligations%20compared%20to%20traditional%20methods%3F%22%7D" />.
+  **TrancheMaster** is a calculator for the French income tax (*Impôt sur le Revenu*). It allows you to:
+  - Determine your tax bracket based on your income.
+  - Estimate the income corresponding to a specific tax threshold.
+  The simulator uses the **official 2025 tax brackets** to provide accurate, up-to-date results. Whether you're planning your finances or just curious, TrancheMaster simplifies understanding your tax obligations.
 </details>
+
 <details>
   <summary>🇫🇷 Français</summary>
   Bienvenue !
-  **TrancheMaster** est une calculette pour l'Impôt sur le Revenu (IR) en France. Elle vous permet de déterminer votre tranche d'imposition en fonction de vos revenus, ou d'estimer le revenu correspondant à un seuil d'impôt donné. Le simulateur utilise les tranches officielles de l'année 2025 pour vous fournir des résultats précis. Que vous planifiez vos finances ou que vous soyez simplement curieux, TrancheMaster vous aide à comprendre vos obligations fiscales de manière claire et rapide.
+  **TrancheMaster** est une calculette pour l'*Impôt sur le Revenu* (IR) en France. Elle vous permet de :
+  - Déterminer votre tranche d'imposition en fonction de vos revenus.
+  - Estimer le revenu correspondant à un seuil d'impôt donné.
+  Le simulateur utilise les **tranches officielles 2025** pour des résultats précis et actualisés. Que vous planifiez vos finances ou soyez simplement curieux, TrancheMaster rend vos obligations fiscales claires et accessibles.
 </details>
+
 <details>
   <summary>🇪🇸 Español</summary>
   ¡Bienvenido!
-  **TrancheMaster** es una calculadora para el impuesto sobre la renta francés (Impôt sur le Revenu). Le permite determinar su tramo impositivo según sus ingresos, o estimar los ingresos correspondientes a un umbral fiscal específico. El simulador utiliza las escalas oficiales del año 2025 para ofrecer resultados precisos. Ya sea que esté planificando sus finanzas o simplemente tenga curiosidad, TrancheMaster le ayuda a entender sus obligaciones fiscales de manera clara y rápida.
+  **TrancheMaster** es una calculadora para el impuesto sobre la renta francés (*Impôt sur le Revenu*). Permite:
+  - Determinar su tramo impositivo según sus ingresos.
+  - Estimar los ingresos correspondientes a un umbral fiscal específico.
+  El simulador utiliza las **escalas oficiales de 2025** para ofrecer resultados precisos y actualizados. Ya sea para planificar sus finanzas o por curiosidad, TrancheMaster simplifica la comprensión de sus obligaciones fiscales.
 </details>
+
 <details>
   <summary>🇩🇪 Deutsch</summary>
   Willkommen!
-  **TrancheMaster** ist ein Rechner für die französische Einkommensteuer (Impôt sur le Revenu). Damit können Sie Ihre Steuerklasse basierend auf Ihrem Einkommen bestimmen oder das Einkommen schätzen, das einem bestimmten Steuersatz entspricht. Der Simulator verwendet die offiziellen Steuersätze des Jahres 2025, um genaue Ergebnisse zu liefern. Egal, ob Sie Ihre Finanzen planen oder einfach neugierig sind, TrancheMaster hilft Ihnen, Ihre Steuerverpflichtungen klar und schnell zu verstehen.
+  **TrancheMaster** ist ein Rechner für die französische Einkommensteuer (*Impôt sur le Revenu*). Damit können Sie:
+  - Ihre Steuerklasse basierend auf Ihrem Einkommen bestimmen.
+  - Das Einkommen schätzen, das einem bestimmten Steuersatz entspricht.
+  Der Simulator nutzt die **offiziellen Steuersätze 2025** für genaue und aktuelle Ergebnisse. Egal, ob Sie Ihre Finanzen planen oder einfach neugierig sind, TrancheMaster macht Ihre Steuerverpflichtungen verständlich.
 </details>
 
 ## App Link 🚀
 
-This app is accessible [> on GitHub Pages <](https://odysseu.github.io/TrancheMaster/) (replace with your actual GitHub Pages link if available).
+Try the app directly: **[TrancheMaster on GitHub Pages](https://odysseu.github.io/TrancheMaster/)**
 
 
-## Deploy and try the simulator locally 💻
+## Deploy and Try Locally 💻
 
-This is a static website merely using local files and javascript packages downloaded from the [jsdeliver **C**ontent **D**elivery **N**etwork](https://cdn.jsdelivr.net).
+This is a **static website** using local files and JavaScript packages from [jsDelivr CDN](https://cdn.jsdelivr.net).
 
 ### Prerequisites
 
@@ -94,13 +109,13 @@ Special thanks to [js-coverage-badges](https://github.com/marialuisacp/js-covera
 
 - Go to the project root :
 
-  ```
+  ```sh
   cd HabitatCalc
   ```
 
 - Install Dependencies:
 
-  ```
+  ```sh
   npm install
   ```
 
@@ -108,7 +123,7 @@ Special thanks to [js-coverage-badges](https://github.com/marialuisacp/js-covera
 
 To run the tests, use the following command:
 
-  ```
+  ```sh
   npm test
   ```
 

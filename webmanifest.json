@@ -5,8 +5,8 @@
   "scope": "/TrancheMaster/",
   "start_url": "/TrancheMaster/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff",
+  "theme_color": "#000000c9",
+  "background_color": "#1e2a38",
   "icons": [
     {
       "src": "logo-TrancheMaster.png",

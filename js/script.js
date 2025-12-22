@@ -14,7 +14,7 @@ let revenuInput, revenuTypeSelect, fixedChargesInput,
   taxPercentageInput, taxAmountInput, taxTypeSelect, fixedChargesReverseInput,
   taxPercentageElement, thresholdBreakdownElement, totalTaxElement, missingMoneyElement,
   calculatedRevenuElement, abattementBtn, fixedChargesBtn, taxPercentageBtn, taxAmountBtn,
-  abattementReverseBtn, fixedChargesReverseBtn;
+  abattementReverseBtn, fixedChargesReverseBtn, yearlyOptionBtn, monthlyOptionBtn;
 
 // Initialize the application
 document.addEventListener("DOMContentLoaded", async () => {
@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Get DOM elements
   revenuInput = document.getElementById("revenu");
-  revenuTypeSelect = document.getElementById("revenu-type");
+  // revenuTypeSelect = document.getElementById("revenu-type");
   fixedChargesInput = document.getElementById("fixed-charges");
   taxPercentageInput = document.getElementById("tax-percentage-input");
   taxAmountInput = document.getElementById("tax-amount");
@@ -63,6 +63,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   taxAmountBtn = document.getElementById("tax-amount-btn");
   abattementReverseBtn = document.getElementById("abattement-reverse-btn");
   fixedChargesReverseBtn = document.getElementById("fixed-charges-reverse-btn");
+  yearlyOptionBtn = document.getElementById("yearly-option-btn");
+  monthlyOptionBtn = document.getElementById("monthly-option-btn");
 
   // Get section elements
   const revenuToImpotBtn = document.getElementById("revenu-to-impot-btn");
@@ -114,6 +116,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     fixedChargesBtn.classList.add("active");
     abattementBtn.classList.remove("active");
     calculateRevenuToImpot();
+  });
+
+// Impôt → Revenu: Yearly or monthly menu
+  yearlyOptionBtn.addEventListener("click", () => {
+    taxTypeSelect.value = "yearly";
+    yearlyOptionBtn.classList.add("active");
+    monthlyOptionBtn.classList.remove("active");
+    calculateImpotToRevenu();
+  });
+
+  monthlyOptionBtn.addEventListener("click", () => {
+    taxTypeSelect.value = "monthly";
+    monthlyOptionBtn.classList.add("active");
+    yearlyOptionBtn.classList.remove("active");
+    calculateImpotToRevenu();
   });
 
   // Impôt → Revenu: Percentage or value menu

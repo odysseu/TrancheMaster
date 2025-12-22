@@ -47,10 +47,16 @@
             </div>
             <div class="input-group">
                 <label for="revenu-type" data-i18n="revenu-type-label">Type de revenu&nbsp:</label>
-                <select id="revenu-type">
-                    <option value="yearly" data-i18n="yearly-option">Annuel</option>
-                    <option value="monthly" data-i18n="monthly-option">Mensuel</option>
-                </select>
+                <div class="menu">
+                    <button id="yearly-option-btn" class="menu-btn" data-i18n="yearly-option">Annuel</button>
+                    <button id="monthly-option-btn" class="menu-btn active" data-i18n="monthly-option">Mensuel</button>
+                </div>
+                <!-- <div class="menu">
+                    <select id="revenu-type" class="menu-btn">
+                        <option value="yearly" data-i18n="yearly-option">Annuel</option>
+                        <option value="monthly" data-i18n="monthly-option">Mensuel</option>
+                    </select>
+                </div> -->
             </div>
             <!-- Menu for 10% or charges -->
             <div class="menu">

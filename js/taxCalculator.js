@@ -72,10 +72,10 @@ export function findThresholdForTaxPercentage(taxPercentage) {
   for (let i = 0; i < THRESHOLD_DATA.length; i++) {
     const threshold = THRESHOLD_DATA[i];
     if (taxPercentage >= threshold.minTaxPercentage && taxPercentage <= threshold.maxTaxPercentage) {
-      return { threshold }; // , index: i
+      return { threshold };
     }
   }
-  return { threshold: null }; // , index: -1
+  return { threshold: null };
 }
 
 // Calculate revenue from tax amount
@@ -121,20 +121,6 @@ export function calculateNetRevenuFromTaxPercentage(taxPercentage, chargesType, 
   if (taxPercentage === 0) {
     taxableIncome = TAX_THRESHOLDS[0].max;
   } else {
-    // For the first taxable threshold (special case)
-    // if (threshold.min === 11498) {
-    //   const income = 11497 / (1 - taxRate / 0.11);
-    //   let estimatedRevenu;
-    //   if (chargesType === "abattement") {
-    //     estimatedRevenu = income / 0.9;
-    //   } else {
-    //     estimatedRevenu = income + fixedCharges;
-    //   }
-    //   return {
-    //     yearly: formatNumber(estimatedRevenu),
-    //     monthly: formatNumber(estimatedRevenu / 12)
-    //   };
-    // }
     const numerator = threshold.cumulativeTax - threshold.rate * (threshold.min - 0);
     const denominator = taxRate - threshold.rate;
     taxableIncome = numerator / denominator;

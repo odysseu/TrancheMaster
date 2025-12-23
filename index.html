@@ -51,12 +51,6 @@
                     <button id="yearly-option-btn" class="menu-btn" data-i18n="yearly-option">Annuel</button>
                     <button id="monthly-option-btn" class="menu-btn active" data-i18n="monthly-option">Mensuel</button>
                 </div>
-                <!-- <div class="menu">
-                    <select id="revenu-type" class="menu-btn">
-                        <option value="yearly" data-i18n="yearly-option">Annuel</option>
-                        <option value="monthly" data-i18n="monthly-option">Mensuel</option>
-                    </select>
-                </div> -->
             </div>
             <!-- Menu for 10% or charges -->
             <div class="menu">
@@ -100,10 +94,13 @@
                 <input type="number" id="tax-amount" inputmode="decimal" step="0.01" placeholder data-i18n-placeholder="tax-amount-placeholder">
             </div>
             <div class="input-group tax-type-group hidden" id="tax-type-group">
-                <select id="tax-type">
-                    <option value="yearly" data-i18n="yearly-option">Annuel</option>
-                    <option value="monthly" data-i18n="monthly-option">Mensuel</option>
-                </select>
+                <div class="input-group">
+                    <label for="tax-type" data-i18n="tax-type-label">Type d'impôt&nbsp:</label>
+                    <div class="menu">
+                        <button id="yearly-option-reversed-btn" class="menu-btn" data-i18n="yearly-option">Annuel</button>
+                        <button id="monthly-option-reversed-btn" class="menu-btn active" data-i18n="monthly-option">Mensuel</button>
+                    </div>
+                </div>
             </div>
             <!-- Menu for 10% or charges -->
             <div class="menu">

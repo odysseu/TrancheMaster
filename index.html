@@ -44,7 +44,8 @@
         <!-- Revenu → Impôt section -->
         <div id="revenu-to-impot-section" class="section active">
             <div class="input-group">
-                <input type="number" id="revenu" placeholder data-i18n-placeholder="revenu-placeholder" inputmode="decimal" step="0.01">
+                <input type="number" id="revenu" placeholder=" " inputmode="decimal" step="0.01">
+                <span class="floating-placeholder" data-i18n="revenu-placeholder"></span>
             </div>
             <div class="input-group">
                 <div class="menu">
@@ -58,11 +59,12 @@
                 <button id="fixed-charges-btn" class="menu-btn" data-i18n="fixed-charges-btn"></button>
             </div>
             <div class="input-group" id="fixed-charges-group" style="display: none;">
-                <input type="number" id="fixed-charges" placeholder data-i18n-placeholder="fixed-charges-placeholder" inputmode="decimal" step="0.01">
+                <input type="number" id="fixed-charges" placeholder=" " inputmode="decimal" step="0.01">
+                <span class="floating-placeholder" data-i18n="fixed-charges-placeholder"></span>
             </div>
             <div class="results">
                 <h2 data-i18n="results-title"></h2>
-                <p id="tax-percentage" data-i18n-prefix="tax-percentage-prefix"></p>
+                <p id="tax-percentage" data-i18n="tax-percentage-prefix"></p>
                 <table class="threshold-table">
                     <thead>
                         <tr>
@@ -76,8 +78,8 @@
                         <!-- Filled by JavaScript -->
                     </tbody>
                 </table>
-                <p id="total-tax" data-i18n-prefix="total-tax-prefix"></p>
-                <p id="missing-money" data-i18n-prefix="missing-money-prefix"></p>
+                <p id="total-tax" data-i18n="total-tax-prefix"></p>
+                <p id="missing-money" data-i18n="missing-money-prefix"></p>
             </div>
         </div>
         <!-- Impôt → Revenu section -->
@@ -88,10 +90,12 @@
                 <button id="tax-amount-btn" class="menu-btn" data-i18n="tax-amount-btn"></button>
             </div>
             <div class="input-group" id="tax-percentage-group">
-                <input type="number" id="tax-percentage-input" inputmode="decimal" step="0.01" placeholder data-i18n-placeholder="tax-percentage-placeholder">
+                <input type="number" id="tax-percentage-input" inputmode="decimal" step="0.01" placeholder=" ">
+                <span class="floating-placeholder" data-i18n="tax-percentage-placeholder"></span>
             </div>
             <div class="input-group tax-type-group hidden" id="tax-amount-group">
-                <input type="number" id="tax-amount" inputmode="decimal" step="0.01" placeholder data-i18n-placeholder="tax-amount-placeholder">
+                <input type="number" id="tax-amount" inputmode="decimal" step="0.01" placeholder=" ">
+                <span class="floating-placeholder" data-i18n="tax-amount-placeholder"></span>
             </div>
             <div class="input-group tax-type-group hidden" id="tax-type-group">
                 <div class="input-group">
@@ -110,12 +114,12 @@
                 <button id="fixed-charges-reverse-btn" class="menu-btn" data-i18n="fixed-charges-reverse-btn"></button>
             </div>
             <div class="input-group" id="fixed-charges-group-reverse" style="display: none;">
-                <input type="number" id="fixed-charges-reverse" inputmode="decimal" step="0.01" placeholder
-                    data-i18n-placeholder="fixed-charges-reverse-placeholder">
+                <input type="number" id="fixed-charges-reverse" inputmode="decimal" step="0.01" placeholder=" ">
+                <span class="floating-placeholder" data-i18n="fixed-charges-reverse-placeholder"></span>
             </div>
             <div class="results">
                 <h2 data-i18n="results-title"></h2>
-                <p id="calculated-revenu" data-i18n-prefix="calculated-revenu-prefix"></p>
+                <p id="calculated-revenu" data-i18n="calculated-revenu-prefix"></p>
                 <!-- Added table for threshold breakdown -->
                 <table class="threshold-table" id="threshold-breakdown-reverse">
                     <thead>

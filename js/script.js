@@ -80,10 +80,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const taxTypeGroup = document.getElementById("tax-type-group");
   const fixedChargesGroupReverse = document.getElementById("fixed-charges-group-reverse");
 
-  // Set max value for tax percentage input
-  taxPercentageInput.setAttribute("max", "40.50");
-  taxPercentageInput.setAttribute("step", "0.01");
-
   // Initialize visibility on page load
   taxTypeGroup.classList.add("hidden");
 
@@ -227,8 +223,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
     let missingMoneyYearly = nextThreshold ? nextThreshold.min - taxableIncome : 0;
     let missingMoneyMonthly = missingMoneyYearly / 12;
-    taxPercentageElement.textContent = window.translationSystem.getTranslation("tax-percentage-prefix") + taxPercentage.toFixed(3) + "%";
-    totalTaxElement.textContent = window.translationSystem.getTranslation("total-tax-prefix") + formatNumber(tax) + "€";
+    taxPercentageElement.textContent = window.translationSystem.getTranslation("tax-percentage-prefix") + taxPercentage.toFixed(3) + "\u00A0%";
+    totalTaxElement.textContent = window.translationSystem.getTranslation("total-tax-prefix") + formatNumber(tax) + "\u00A0€";
     if (tax === 0) {
       missingMoneyElement.textContent = window.translationSystem.getTranslation(
         "no-tax-complete",

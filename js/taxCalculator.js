@@ -24,7 +24,7 @@ for (let i = 0; i < TAX_THRESHOLDS.length; i++) {
   const maxTax = cumulativeTax + (threshold.max - Math.max(threshold.min - 1, 0)) * threshold.rate;
   // Calculate min and max tax percentages for this threshold
   let minTaxPercentage = i > 0 ? (minTax / threshold.min) * 100 : 0;
-  let maxTaxPercentage = threshold.max !== Infinity ? maxTax / threshold.max * 100 : threshold.rate - 1E-15;
+  let maxTaxPercentage = threshold.max !== Infinity ? maxTax / threshold.max * 100 : threshold.rate * 100 - 1E-15;
   THRESHOLD_DATA.push({
     min: threshold.min,
     max: threshold.max,
@@ -69,13 +69,18 @@ export function calculateTaxWithBreakdown(taxableIncome) {
 
 // Find the appropriate threshold for a given tax percentage
 export function findThresholdForTaxPercentage(taxPercentage) {
-  for (let i = 0; i < THRESHOLD_DATA.length; i++) {
-    const threshold = THRESHOLD_DATA[i];
-    if (taxPercentage >= threshold.minTaxPercentage && taxPercentage <= threshold.maxTaxPercentage) {
-      return { threshold };
-    }
+  if (taxPercentage == 0) {
+    return { threshold: THRESHOLD_DATA[0] };
   }
-  return { threshold: null };
+  else {
+    for (let i = 1; i < THRESHOLD_DATA.length; i++) {
+      const threshold = THRESHOLD_DATA[i];
+      if (taxPercentage >= threshold.minTaxPercentage && taxPercentage < threshold.maxTaxPercentage) {
+        return { threshold };
+      }
+    }
+    return { threshold: null };
+  }
 }
 
 // Calculate revenue from tax amount

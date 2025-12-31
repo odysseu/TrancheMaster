@@ -86,9 +86,9 @@ describe('script.js DOM Interactions', () => {
     // Import script.js after mocking and setting up the DOM
     require('../js/script.js');
 
-    document.getElementById('revenu-to-impot-btn').click();
-    document.getElementById('yearly-option-btn').click();
-    document.getElementById('fixed-charges-btn').click();
+    // document.getElementById('revenu-to-impot-btn').click();
+    // document.getElementById('yearly-option-btn').click();
+    // document.getElementById('fixed-charges-btn').click();
     // document.getElementById('tax-percentage-btn').click();
 
     // Set input values

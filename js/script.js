@@ -10,11 +10,11 @@ import {
 } from './taxCalculator.js';
 
 // DOM elements
-let revenuInput, revenuTypeSelect, fixedChargesInput,
-  taxPercentageInput, taxAmountInput, taxTypeSelect, fixedChargesReverseInput,
+let revenuInput, fixedChargesInput,
+  taxPercentageInput, taxAmountInput, fixedChargesReverseInput, // taxTypeSelect,
   taxPercentageElement, thresholdBreakdownElement, totalTaxElement, missingMoneyElement,
   calculatedRevenuElement, abattementBtn, fixedChargesBtn, taxPercentageBtn, taxAmountBtn,
-  abattementReverseBtn, fixedChargesReverseBtn;
+  abattementReverseBtn, fixedChargesReverseBtn, yearlyOptionBtn, monthlyOptionBtn, yearlyOptionReverseBtn, monthlyOptionReverseBtn;
 
 // Initialize the application
 document.addEventListener("DOMContentLoaded", async () => {
@@ -42,11 +42,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Get DOM elements
   revenuInput = document.getElementById("revenu");
-  revenuTypeSelect = document.getElementById("revenu-type");
   fixedChargesInput = document.getElementById("fixed-charges");
   taxPercentageInput = document.getElementById("tax-percentage-input");
   taxAmountInput = document.getElementById("tax-amount");
-  taxTypeSelect = document.getElementById("tax-type");
+  // taxTypeSelect = document.getElementById("tax-type");
   fixedChargesReverseInput = document.getElementById("fixed-charges-reverse");
 
   // Get result elements
@@ -63,6 +62,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   taxAmountBtn = document.getElementById("tax-amount-btn");
   abattementReverseBtn = document.getElementById("abattement-reverse-btn");
   fixedChargesReverseBtn = document.getElementById("fixed-charges-reverse-btn");
+  yearlyOptionBtn = document.getElementById("yearly-option-btn");
+  monthlyOptionBtn = document.getElementById("monthly-option-btn");
+  yearlyOptionReverseBtn = document.getElementById("yearly-option-reversed-btn");
+  monthlyOptionReverseBtn = document.getElementById("monthly-option-reversed-btn");
 
   // Get section elements
   const revenuToImpotBtn = document.getElementById("revenu-to-impot-btn");
@@ -76,10 +79,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const taxAmountGroup = document.getElementById("tax-amount-group");
   const taxTypeGroup = document.getElementById("tax-type-group");
   const fixedChargesGroupReverse = document.getElementById("fixed-charges-group-reverse");
-
-  // Set max value for tax percentage input
-  taxPercentageInput.setAttribute("max", "40.50");
-  taxPercentageInput.setAttribute("step", "0.01");
 
   // Initialize visibility on page load
   taxTypeGroup.classList.add("hidden");
@@ -114,6 +113,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     fixedChargesBtn.classList.add("active");
     abattementBtn.classList.remove("active");
     calculateRevenuToImpot();
+  });
+
+  // Impôt → Revenu: Yearly or monthly menu
+  yearlyOptionBtn.addEventListener("click", () => {
+    yearlyOptionBtn.classList.add("active");
+    monthlyOptionBtn.classList.remove("active");
+    calculateRevenuToImpot();
+  });
+
+  monthlyOptionBtn.addEventListener("click", () => {
+    monthlyOptionBtn.classList.add("active");
+    yearlyOptionBtn.classList.remove("active");
+    calculateRevenuToImpot();
+  });
+
+  yearlyOptionReverseBtn.addEventListener("click", () => {
+    yearlyOptionReverseBtn.classList.add("active");
+    monthlyOptionReverseBtn.classList.remove("active");
+    calculateImpotToRevenu();
+  });
+
+  monthlyOptionReverseBtn.addEventListener("click", () => {
+    monthlyOptionReverseBtn.classList.add("active");
+    yearlyOptionReverseBtn.classList.remove("active");
+    calculateImpotToRevenu();
   });
 
   // Impôt → Revenu: Percentage or value menu
@@ -152,11 +176,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Add event listeners for input changes
   revenuInput.addEventListener("input", calculateRevenuToImpot);
-  revenuTypeSelect.addEventListener("change", calculateRevenuToImpot);
   fixedChargesInput.addEventListener("input", calculateRevenuToImpot);
   taxPercentageInput.addEventListener("input", calculateImpotToRevenu);
   taxAmountInput.addEventListener("input", calculateImpotToRevenu);
-  taxTypeSelect.addEventListener("change", calculateImpotToRevenu);
   fixedChargesReverseInput.addEventListener("input", calculateImpotToRevenu);
 
   // Revenu → Impôt logic
@@ -169,7 +191,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       missingMoneyElement.textContent = "";
       return;
     }
-    const revenuType = revenuTypeSelect.value;
+    const revenuType = yearlyOptionBtn.classList.contains("active") ? "yearly" : "monthly";
     const yearlyRevenu = revenuType === "monthly" ? revenu * 12 : revenu;
     // Use the selected menu to determine the method
     const chargesType = abattementBtn.classList.contains("active") ? "abattement" : "fixed";
@@ -201,8 +223,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
     let missingMoneyYearly = nextThreshold ? nextThreshold.min - taxableIncome : 0;
     let missingMoneyMonthly = missingMoneyYearly / 12;
-    taxPercentageElement.textContent = window.translationSystem.getTranslation("tax-percentage-prefix") + taxPercentage.toFixed(3) + "%";
-    totalTaxElement.textContent = window.translationSystem.getTranslation("total-tax-prefix") + formatNumber(tax) + "€";
+    taxPercentageElement.textContent = window.translationSystem.getTranslation("tax-percentage-prefix") + taxPercentage.toFixed(3) + "\u00A0%";
+    totalTaxElement.textContent = window.translationSystem.getTranslation("total-tax-prefix") + formatNumber(tax) + "\u00A0€";
     if (tax === 0) {
       missingMoneyElement.textContent = window.translationSystem.getTranslation(
         "no-tax-complete",
@@ -322,8 +344,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
-      const taxType = taxTypeSelect.value;
-      const yearlyTax = taxType === "monthly" ? taxAmount * 12 : taxAmount;
+      const taxType = yearlyOptionReverseBtn.classList.contains("active") ? "yearly" : "monthly";
+      const yearlyTax = taxType === "yearly" ? taxAmount : taxAmount * 12;
       const calculatedNetIncome = calculateNetRevenuFromTaxValue(yearlyTax, chargesType, fixedCharges);
 
       // Calculate taxable income for breakdown

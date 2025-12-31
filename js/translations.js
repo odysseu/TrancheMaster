@@ -35,11 +35,6 @@ function updateLanguage() {
     }
   });
 
-  // Update document title
-  if (translations['title']) {
-    document.title = translations['title'];
-  }
-
   // Update HTML lang attribute
   document.documentElement.lang = currentLanguage;
 

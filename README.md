@@ -43,6 +43,13 @@ TrancheMaster helps you determine your tax bracket based on your income, or esti
   Der Simulator nutzt die **offiziellen Steuersätze 2025** für genaue und aktuelle Ergebnisse. Egal, ob Sie Ihre Finanzen planen oder einfach neugierig sind, TrancheMaster macht Ihre Steuerverpflichtungen verständlich.
 </details>
 
+## Quick Navigation 🗺️
+
+- [🚀 App Link](#app-link-)
+- [💻 Local Deployment](#deploy-and-try-locally-)
+- [🧪 Testing](#testing-)
+- [🔄 Tax Data Updater](#tax-data-updater-)
+
 ## App Link 🚀
 
 Try the app directly: **[TrancheMaster on GitHub Pages](https://odysseu.github.io/TrancheMaster/)**
@@ -136,3 +143,147 @@ To run the tests, use the following command:
 #### Test files exemples
 
 See the `*.test.js` files in the `tests/` directory for test file inspiration
+
+## Tax Data Updater 🔄
+
+**Automatically update tax thresholds from official French government sources**
+
+The Tax Data Updater script fetches the latest tax bracket information and updates the application automatically.
+
+### Quick Start
+
+Run the updater in **2 simple steps**:
+
+```bash
+# 1. Navigate to js directory
+cd js
+
+# 2. Run the updater
+node update_tax_data.js
+```
+
+That's it! The script will:
+- ✅ Fetch latest tax data from official sources
+- ✅ Update `data/tax_thresholds.json` with current thresholds
+- ✅ Update HTML year selector with available years
+- ✅ Update JavaScript tax calculator with new data
+
+### Features
+
+- **Automatic Data Fetching**: Retrieves from French Government Tax Portal and Legifrance
+- **Robust Parsing**: Handles table and text-based tax data formats
+- **Fallback System**: Uses current data if online sources are unavailable
+- **Complete Updates**: JSON data, HTML selector, and JavaScript calculator
+- **Comprehensive Testing**: Full test suite included
+- **Safe Testing**: Dry-run mode and custom output paths prevent accidental data loss
+- **Environment Variables**: Control output locations for safe experimentation
+
+### Safety Features
+
+The updater includes several safety mechanisms:
+
+**Command Line Arguments:**
+- `--test` or `-t` - Use test output files (writes to `data/test_tax_thresholds.json`)
+- `--dry-run` or `-n` - Preview changes without modifying files
+- `--test --dry-run` - Preview test mode changes
+
+**Environment Variables:**
+- `DRY_RUN=true` - Preview changes without writing files
+- `TEST_MODE=true` - Use test output files
+- `TAX_DATA_OUTPUT_JSON` - Custom JSON output path
+- `TAX_DATA_OUTPUT_JS` - Custom JavaScript output path
+- `TAX_DATA_OUTPUT_HTML` - Custom HTML output path
+
+**Test Mode:**
+```bash
+node update_tax_data.js --test
+```
+Writes output to `data/test_tax_thresholds.json` instead of the production file.
+
+**Dry Run Mode:**
+```bash
+node update_tax_data.js --dry-run
+```
+Shows what changes would be made without modifying any files.
+
+### Scheduled Updates
+
+For automatic monthly updates, add to your crontab:
+
+```bash
+# Run monthly on the 1st at 2 AM
+0 2 1 * * cd /path/to/project/js && node update_tax_data.js >> /var/log/tax_updater.log 2>&1
+```
+
+### Manual Execution Options
+
+**Direct Node.js:**
+```bash
+cd js
+node update_tax_data.js
+```
+
+**Test Mode (Safe Testing):**
+```bash
+cd js
+node update_tax_data.js --test
+# or
+node update_tax_data.js -t
+```
+This writes output to `data/test_tax_thresholds.json` instead of the production file.
+
+**Dry Run (Preview Changes):**
+```bash
+cd js
+node update_tax_data.js --dry-run
+# or
+node update_tax_data.js -n
+```
+Shows what changes would be made without modifying any files.
+
+**Combined Test + Dry Run:**
+```bash
+cd js
+node update_tax_data.js --test --dry-run
+```
+Preview changes that would be made in test mode.
+
+**Custom Output Paths:**
+```bash
+cd js
+TAX_DATA_OUTPUT_JSON="/tmp/test_tax_data.json" node update_tax_data.js
+```
+
+**Run Tests:**
+```bash
+cd js
+npm test
+```
+
+### Troubleshooting
+
+**Dependencies missing?**
+```bash
+cd scripts
+npm install
+```
+
+**Permission issues?**
+```bash
+chmod +x scripts/*.sh scripts/*.js
+```
+
+**Network problems?** The script automatically falls back to current data if online sources are unavailable.
+
+### Data Sources
+
+The script fetches from:
+- 🇫🇷 French Government Tax Portal: [impots.gouv.fr](https://www.impots.gouv.fr/)
+- 📜 Official Journal of France: [legifrance.gouv.fr](https://www.legifrance.gouv.fr/)
+
+### Manual Updates
+
+If automatic fetching fails, you can manually edit:
+1. `data/tax_thresholds.json` - Update the JSON data
+2. `js/taxCalculator.js` - Update the `TAX_THRESHOLDS_BY_YEAR` object
+3. `index.html` - Update the year selector options

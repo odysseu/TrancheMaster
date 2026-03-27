@@ -1,7 +1,6 @@
 // script.js - Main application file with DOM interactions
 import {
-  TAX_THRESHOLDS,
-  THRESHOLD_DATA,
+  TAX_THRESHOLDS_BY_YEAR,
   calculateTaxWithBreakdown,
   calculateNetRevenuFromTaxValue,
   findThresholdForTaxPercentage,
@@ -200,7 +199,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const revenuType = yearlyOptionBtn.classList.contains("active") ? "yearly" : "monthly";
     const yearlyRevenu = revenuType === "monthly" ? revenu * 12 : revenu;
     const selectedYear = parseInt(yearSelect.value) || 2025;
-    const thresholds = window.TAX_THRESHOLDS_BY_YEAR[selectedYear] || window.TAX_THRESHOLDS_BY_YEAR[2025];
+    const thresholds = TAX_THRESHOLDS_BY_YEAR[selectedYear] || TAX_THRESHOLDS_BY_YEAR[2025];
     
     // Use the selected menu to determine the method
     const chargesType = abattementBtn.classList.contains("active") ? "abattement" : "fixed";
@@ -256,7 +255,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Impôt → Revenu logic
   function calculateImpotToRevenu() {
     const selectedYear = parseInt(yearSelect.value) || 2025;
-    const thresholds = window.TAX_THRESHOLDS_BY_YEAR[selectedYear] || window.TAX_THRESHOLDS_BY_YEAR[2025];
+    const thresholds = TAX_THRESHOLDS_BY_YEAR[selectedYear] || TAX_THRESHOLDS_BY_YEAR[2025];
     
     // Use the selected menu to determine the method
     const isTaxPercentageMode = taxPercentageBtn.classList.contains("active");

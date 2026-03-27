@@ -4,23 +4,16 @@ export const TAX_THRESHOLDS_BY_YEAR = {
   2025: [
     { min: 0, max: 11497, rate: 0 },
     { min: 11498, max: 29315, rate: 0.11 },
-    { min: 29316, max: 83823, rate: 0.30 },
+    { min: 29316, max: 83823, rate: 0.3 },
     { min: 83824, max: 180294, rate: 0.41 },
     { min: 180295, max: Infinity, rate: 0.45 }
   ],
-  2024: [
-    { min: 0, max: 11294, rate: 0 },
-    { min: 11295, max: 28797, rate: 0.11 },
-    { min: 28798, max: 82341, rate: 0.30 },
-    { min: 82342, max: 177106, rate: 0.41 },
-    { min: 177107, max: Infinity, rate: 0.45 }
-  ],
-  2023: [
-    { min: 0, max: 11294, rate: 0 },
-    { min: 11295, max: 28797, rate: 0.11 },
-    { min: 28798, max: 82341, rate: 0.30 },
-    { min: 82342, max: 177106, rate: 0.41 },
-    { min: 177107, max: Infinity, rate: 0.45 }
+  2026: [
+    { min: 0, max: 11497, rate: 0 },
+    { min: 11498, max: 29315, rate: 0.11 },
+    { min: 29316, max: 83823, rate: 0.3 },
+    { min: 83824, max: 180294, rate: 0.41 },
+    { min: 180295, max: Infinity, rate: 0.45 }
   ]
 };
 

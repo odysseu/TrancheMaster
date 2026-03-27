@@ -23,6 +23,13 @@
         </div>
         <h1 data-i18n="main-title"></h1>
         <div class="header-right">
+            <div class="year-selector-container">
+                <select id="year-select" class="year-select">
+                    <option value="2025" selected>2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                </select>
+            </div>
             <div class="language-selector-container">
                 <select id="language-select">
                     <option value="fr" selected data-i18n="language-select-fr"></option>
@@ -41,6 +48,7 @@
             <button id="revenu-to-impot-btn" class="menu-btn active" data-i18n="revenu-to-impot-btn"></button>
             <button id="impot-to-revenu-btn" class="menu-btn" data-i18n="impot-to-revenu-btn"></button>
         </div>
+
         <!-- Revenu → Impôt section -->
         <div id="revenu-to-impot-section" class="section active">
             <div class="input-group">

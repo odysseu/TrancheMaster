@@ -14,7 +14,8 @@ let revenuInput, fixedChargesInput,
   taxPercentageInput, taxAmountInput, fixedChargesReverseInput, // taxTypeSelect,
   taxPercentageElement, thresholdBreakdownElement, totalTaxElement, missingMoneyElement,
   calculatedRevenuElement, abattementBtn, fixedChargesBtn, taxPercentageBtn, taxAmountBtn,
-  abattementReverseBtn, fixedChargesReverseBtn, yearlyOptionBtn, monthlyOptionBtn, yearlyOptionReverseBtn, monthlyOptionReverseBtn;
+  abattementReverseBtn, fixedChargesReverseBtn, yearlyOptionBtn, monthlyOptionBtn, yearlyOptionReverseBtn, monthlyOptionReverseBtn,
+  yearSelect;
 
 // Initialize the application
 document.addEventListener("DOMContentLoaded", async () => {
@@ -47,6 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   taxAmountInput = document.getElementById("tax-amount");
   // taxTypeSelect = document.getElementById("tax-type");
   fixedChargesReverseInput = document.getElementById("fixed-charges-reverse");
+  yearSelect = document.getElementById("year-select");
 
   // Get result elements
   taxPercentageElement = document.getElementById("tax-percentage");
@@ -180,6 +182,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   taxPercentageInput.addEventListener("input", calculateImpotToRevenu);
   taxAmountInput.addEventListener("input", calculateImpotToRevenu);
   fixedChargesReverseInput.addEventListener("input", calculateImpotToRevenu);
+  yearSelect.addEventListener("change", () => {
+    calculateRevenuToImpot();
+    calculateImpotToRevenu();
+  });
 
   // Revenu → Impôt logic
   function calculateRevenuToImpot() {
@@ -193,6 +199,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     const revenuType = yearlyOptionBtn.classList.contains("active") ? "yearly" : "monthly";
     const yearlyRevenu = revenuType === "monthly" ? revenu * 12 : revenu;
+    const selectedYear = parseInt(yearSelect.value) || 2025;
+    const thresholds = window.TAX_THRESHOLDS_BY_YEAR[selectedYear] || window.TAX_THRESHOLDS_BY_YEAR[2025];
+    
     // Use the selected menu to determine the method
     const chargesType = abattementBtn.classList.contains("active") ? "abattement" : "fixed";
     const fixedCharges = chargesType === "fixed" ? parseFloat(fixedChargesInput.value) || 0 : 0;
@@ -202,7 +211,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
       taxableIncome = Math.max(0, yearlyRevenu - fixedCharges);
     }
-    const { tax, breakdown } = calculateTaxWithBreakdown(taxableIncome);
+    const { tax, breakdown } = calculateTaxWithBreakdown(taxableIncome, selectedYear);
     const taxPercentage = taxableIncome === 0 ? 0 : (tax / taxableIncome) * 100;
     // Display threshold breakdown
     thresholdBreakdownElement.innerHTML = "";
@@ -218,7 +227,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       `;
       thresholdBreakdownElement.appendChild(row);
     });
-    const nextThreshold = TAX_THRESHOLDS.find(threshold =>
+    const nextThreshold = thresholds.find(threshold =>
       taxableIncome < threshold.min
     );
     let missingMoneyYearly = nextThreshold ? nextThreshold.min - taxableIncome : 0;
@@ -229,7 +238,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       missingMoneyElement.textContent = window.translationSystem.getTranslation(
         "no-tax-complete",
         formatNumber(taxableIncome),
-        formatNumber(TAX_THRESHOLDS[1].min)
+        formatNumber(thresholds[1].min)
       ) + window.translationSystem.getTranslation(
         "missing-money-complete",
         formatNumber(missingMoneyYearly),
@@ -246,6 +255,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Impôt → Revenu logic
   function calculateImpotToRevenu() {
+    const selectedYear = parseInt(yearSelect.value) || 2025;
+    const thresholds = window.TAX_THRESHOLDS_BY_YEAR[selectedYear] || window.TAX_THRESHOLDS_BY_YEAR[2025];
+    
     // Use the selected menu to determine the method
     const isTaxPercentageMode = taxPercentageBtn.classList.contains("active");
     const chargesType = abattementReverseBtn.classList.contains("active") ? "abattement" : "fixed";
@@ -263,16 +275,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // Check if tax percentage is above maximum
-      if (taxPercentage > 40.50 && chargesType === "abattement") {
+      const maxRate = thresholds[thresholds.length - 1].rate * 100;
+      const maxRateWithDeduction = maxRate * 0.9;
+      if (taxPercentage > maxRateWithDeduction && chargesType === "abattement") {
         calculatedRevenuElement.textContent = window.translationSystem.getTranslation("tax-percentage-with-deduction-error");
         return;
-      } else if (taxPercentage > 45 - 1E-15 && chargesType === "fixed") {
+      } else if (taxPercentage > maxRate - 1E-15 && chargesType === "fixed") {
         calculatedRevenuElement.textContent = window.translationSystem.getTranslation("tax-percentage-with-fixed-charges-error");
         return;
       }
 
       if (taxPercentage === 0) {
-        const maxRevenuNoTax = TAX_THRESHOLDS[0].max;
+        const maxRevenuNoTax = thresholds[0].max;
         let calculatedRevenuNoTax;
         if (chargesType === "abattement") {
           calculatedRevenuNoTax = maxRevenuNoTax / 0.9;
@@ -286,14 +300,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // Find the appropriate threshold for this tax percentage
-      const { threshold } = findThresholdForTaxPercentage(taxPercentage); // , index
+      const { threshold } = findThresholdForTaxPercentage(taxPercentage, selectedYear); // , index
       if (!threshold) {
         calculatedRevenuElement.textContent = window.translationSystem.getTranslation("tax-percentage-error");
         return;
       }
 
       // Calculate revenue based on the target threshold
-      const calculatedNetIncome = calculateNetRevenuFromTaxPercentage(taxPercentage, chargesType, fixedCharges, { threshold });
+      const calculatedNetIncome = calculateNetRevenuFromTaxPercentage(taxPercentage, chargesType, fixedCharges, { threshold }, selectedYear);
       calculatedRevenuElement.textContent = window.translationSystem.getTranslation("calculated-revenu-prefix") +
         formatNumber(calculatedNetIncome.yearly) + "€ (" +
         window.translationSystem.getTranslation("monthly-option").toLowerCase() + ": " +
@@ -306,7 +320,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       } else {
         taxableIncome = Math.max(0, calculatedNetIncome.yearly - fixedCharges);
       }
-      const { breakdown } = calculateTaxWithBreakdown(taxableIncome);
+      const { breakdown } = calculateTaxWithBreakdown(taxableIncome, selectedYear);
 
       // Display threshold breakdown
       let cumulativeTax = 0;
@@ -331,7 +345,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       if (taxAmount === 0) {
-        const maxRevenuNoTax = TAX_THRESHOLDS[0].max;
+        const maxRevenuNoTax = thresholds[0].max;
         let calculatedRevenuNoTax;
         if (chargesType === "abattement") {
           calculatedRevenuNoTax = maxRevenuNoTax / 0.9;
@@ -346,7 +360,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const taxType = yearlyOptionReverseBtn.classList.contains("active") ? "yearly" : "monthly";
       const yearlyTax = taxType === "yearly" ? taxAmount : taxAmount * 12;
-      const calculatedNetIncome = calculateNetRevenuFromTaxValue(yearlyTax, chargesType, fixedCharges);
+      const calculatedNetIncome = calculateNetRevenuFromTaxValue(yearlyTax, chargesType, fixedCharges, selectedYear);
 
       // Calculate taxable income for breakdown
       let taxableIncome;
@@ -355,7 +369,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       } else {
         taxableIncome = Math.max(0, calculatedNetIncome.yearly - fixedCharges);
       }
-      const { breakdown } = calculateTaxWithBreakdown(taxableIncome);
+      const { breakdown } = calculateTaxWithBreakdown(taxableIncome, selectedYear);
 
       // Display threshold breakdown
       let cumulativeTax = 0;

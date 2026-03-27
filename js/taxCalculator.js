@@ -1,42 +1,69 @@
 // taxCalculator.js - Pure calculation functions
-// Tax thresholds for 2025
-export const TAX_THRESHOLDS = [
-  { min: 0, max: 11497, rate: 0 },
-  { min: 11498, max: 29315, rate: 0.11 },
-  { min: 29316, max: 83823, rate: 0.30 },
-  { min: 83824, max: 180294, rate: 0.41 },
-  { min: 180295, max: Infinity, rate: 0.45 }
-];
+// Tax thresholds for different years
+export const TAX_THRESHOLDS_BY_YEAR = {
+  2025: [
+    { min: 0, max: 11497, rate: 0 },
+    { min: 11498, max: 29315, rate: 0.11 },
+    { min: 29316, max: 83823, rate: 0.30 },
+    { min: 83824, max: 180294, rate: 0.41 },
+    { min: 180295, max: Infinity, rate: 0.45 }
+  ],
+  2024: [
+    { min: 0, max: 11294, rate: 0 },
+    { min: 11295, max: 28797, rate: 0.11 },
+    { min: 28798, max: 82341, rate: 0.30 },
+    { min: 82342, max: 177106, rate: 0.41 },
+    { min: 177107, max: Infinity, rate: 0.45 }
+  ],
+  2023: [
+    { min: 0, max: 11294, rate: 0 },
+    { min: 11295, max: 28797, rate: 0.11 },
+    { min: 28798, max: 82341, rate: 0.30 },
+    { min: 82342, max: 177106, rate: 0.41 },
+    { min: 177107, max: Infinity, rate: 0.45 }
+  ]
+};
 
-// Pre-calculate tax information for each threshold
-export const THRESHOLD_DATA = [];
-for (let i = 0; i < TAX_THRESHOLDS.length; i++) {
-  const threshold = TAX_THRESHOLDS[i];
-  // Calculate cumulative tax from previous thresholds
-  let cumulativeTax = 0;
-  for (let j = 0; j < i; j++) {
-    const prev = TAX_THRESHOLDS[j];
-    cumulativeTax += (prev.max - Math.max(prev.min - 1, 0)) * prev.rate;
+// Default to 2025 for backward compatibility
+export const TAX_THRESHOLDS = TAX_THRESHOLDS_BY_YEAR[2025];
+
+// Pre-calculate tax information for each threshold for a given year
+export const THRESHOLD_DATA_BY_YEAR = {};
+for (const year in TAX_THRESHOLDS_BY_YEAR) {
+  const thresholds = TAX_THRESHOLDS_BY_YEAR[year];
+  const thresholdData = [];
+  for (let i = 0; i < thresholds.length; i++) {
+    const threshold = thresholds[i];
+    // Calculate cumulative tax from previous thresholds
+    let cumulativeTax = 0;
+    for (let j = 0; j < i; j++) {
+      const prev = thresholds[j];
+      cumulativeTax += (prev.max - Math.max(prev.min - 1, 0)) * prev.rate;
+    }
+    const cumulativeTaxableIncome = Math.max(threshold.min - 1, 0);
+    // Calculate tax range for this threshold
+    const minTax = cumulativeTax;
+    const maxTax = cumulativeTax + (threshold.max - Math.max(threshold.min - 1, 0)) * threshold.rate;
+    // Calculate min and max tax percentages for this threshold
+    let minTaxPercentage = i > 0 ? (minTax / threshold.min) * 100 : 0;
+    let maxTaxPercentage = threshold.max !== Infinity ? maxTax / threshold.max * 100 : threshold.rate * 100 - 1E-15;
+    thresholdData.push({
+      min: threshold.min,
+      max: threshold.max,
+      rate: threshold.rate,
+      minTax: minTax,
+      maxTax: maxTax,
+      minTaxPercentage: minTaxPercentage,
+      maxTaxPercentage: maxTaxPercentage,
+      cumulativeTax: cumulativeTax,
+      cumulativeTaxableIncome: cumulativeTaxableIncome
+    });
   }
-  const cumulativeTaxableIncome = Math.max(threshold.min - 1, 0);
-  // Calculate tax range for this threshold
-  const minTax = cumulativeTax;
-  const maxTax = cumulativeTax + (threshold.max - Math.max(threshold.min - 1, 0)) * threshold.rate;
-  // Calculate min and max tax percentages for this threshold
-  let minTaxPercentage = i > 0 ? (minTax / threshold.min) * 100 : 0;
-  let maxTaxPercentage = threshold.max !== Infinity ? maxTax / threshold.max * 100 : threshold.rate * 100 - 1E-15;
-  THRESHOLD_DATA.push({
-    min: threshold.min,
-    max: threshold.max,
-    rate: threshold.rate,
-    minTax: minTax,
-    maxTax: maxTax,
-    minTaxPercentage: minTaxPercentage,
-    maxTaxPercentage: maxTaxPercentage,
-    cumulativeTax: cumulativeTax,
-    cumulativeTaxableIncome: cumulativeTaxableIncome
-  });
+  THRESHOLD_DATA_BY_YEAR[year] = thresholdData;
 }
+
+// Default to 2025 for backward compatibility
+export const THRESHOLD_DATA = THRESHOLD_DATA_BY_YEAR[2025];
 
 // Helper function to format numbers to 2 decimal places if needed
 export function formatNumber(value) {
@@ -45,12 +72,13 @@ export function formatNumber(value) {
 }
 
 // Calculate tax with breakdown by threshold
-export function calculateTaxWithBreakdown(taxableIncome) {
+export function calculateTaxWithBreakdown(taxableIncome, year = 2025) {
+  const thresholds = TAX_THRESHOLDS_BY_YEAR[year] || TAX_THRESHOLDS_BY_YEAR[2025];
   let tax = 0;
   let thresholdTax = 0;
   let taxableAmount = 0;
   const breakdown = [];
-  for (const threshold of TAX_THRESHOLDS) {
+  for (const threshold of thresholds) {
     if (taxableIncome >= threshold.min) {
       taxableAmount = Math.min(taxableIncome, threshold.max) - Math.max(threshold.min - 1, 0);
       thresholdTax = taxableAmount * threshold.rate;
@@ -68,13 +96,14 @@ export function calculateTaxWithBreakdown(taxableIncome) {
 }
 
 // Find the appropriate threshold for a given tax percentage
-export function findThresholdForTaxPercentage(taxPercentage) {
+export function findThresholdForTaxPercentage(taxPercentage, year = 2025) {
+  const thresholdData = THRESHOLD_DATA_BY_YEAR[year] || THRESHOLD_DATA_BY_YEAR[2025];
   if (taxPercentage == 0) {
-    return { threshold: THRESHOLD_DATA[0] };
+    return { threshold: thresholdData[0] };
   }
   else {
-    for (let i = 1; i < THRESHOLD_DATA.length; i++) {
-      const threshold = THRESHOLD_DATA[i];
+    for (let i = 1; i < thresholdData.length; i++) {
+      const threshold = thresholdData[i];
       if (taxPercentage >= threshold.minTaxPercentage && taxPercentage < threshold.maxTaxPercentage) {
         return { threshold };
       }
@@ -84,15 +113,17 @@ export function findThresholdForTaxPercentage(taxPercentage) {
 }
 
 // Calculate revenue from tax amount
-export function calculateNetRevenuFromTaxValue(taxAmount, chargesType, fixedCharges) {
+export function calculateNetRevenuFromTaxValue(taxAmount, chargesType, fixedCharges, year = 2025) {
+  const thresholds = TAX_THRESHOLDS_BY_YEAR[year] || TAX_THRESHOLDS_BY_YEAR[2025];
+  const thresholdData = THRESHOLD_DATA_BY_YEAR[year] || THRESHOLD_DATA_BY_YEAR[2025];
   // If tax is 0, return the maximum revenue for 0% tax
   let taxableIncome;
   if (taxAmount === 0) {
-    taxableIncome = TAX_THRESHOLDS[0].max;
+    taxableIncome = thresholds[0].max;
   } else {
     // Find the threshold where this tax amount would fall
     let targetThreshold = null;
-    for (const threshold of THRESHOLD_DATA) {
+    for (const threshold of thresholdData) {
       if (taxAmount >= threshold.minTax && taxAmount <= threshold.maxTax) {
         targetThreshold = threshold;
         break;
@@ -100,7 +131,7 @@ export function calculateNetRevenuFromTaxValue(taxAmount, chargesType, fixedChar
     }
     // If no threshold found, use the last one
     if (!targetThreshold) {
-      targetThreshold = THRESHOLD_DATA[THRESHOLD_DATA.length - 1];
+      targetThreshold = thresholdData[thresholdData.length - 1];
     }
     // Calculate taxable income for this threshold
     const taxInThreshold = taxAmount - targetThreshold.cumulativeTax;
@@ -120,11 +151,12 @@ export function calculateNetRevenuFromTaxValue(taxAmount, chargesType, fixedChar
 }
 
 // Calculate revenue from tax percentage using precise formula
-export function calculateNetRevenuFromTaxPercentage(taxPercentage, chargesType, fixedCharges, { threshold }) {
+export function calculateNetRevenuFromTaxPercentage(taxPercentage, chargesType, fixedCharges, { threshold }, year = 2025) {
   const taxRate = taxPercentage / 100;
   let taxableIncome;
   if (taxPercentage === 0) {
-    taxableIncome = TAX_THRESHOLDS[0].max;
+    const thresholds = TAX_THRESHOLDS_BY_YEAR[year] || TAX_THRESHOLDS_BY_YEAR[2025];
+    taxableIncome = thresholds[0].max;
   } else {
     const numerator = threshold.cumulativeTax - threshold.rate * (threshold.min - 0);
     const denominator = taxRate - threshold.rate;

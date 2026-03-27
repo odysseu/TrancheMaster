@@ -34,6 +34,7 @@
   "title": "Calculateur d'Impôt sur le Revenu",
   "total-tax-prefix": "Impôt total\u00A0:\u00A0",
   "yearly-option": "Annuel",
+  "year-select-placeholder": "Année fiscale",
   "zero-tax-message": "Avec 0% d'imposition, votre revenu annuel est inférieur à {0}\u00A0€\u00A0({1}\u00A0€/mois).",
   "cumulative-tax-column": "Impôt cumulé\u00A0(€)"
 }

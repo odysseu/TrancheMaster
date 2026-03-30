@@ -28,7 +28,7 @@
   "tax-percentage-prefix": "The effective tax rate is\u00A0:\u00A0",
   "tax-percentage-with-deduction-error": "The tax percentage cannot exceed 40.50\u00A0% with tax deduction. Please enter a valid value.",
   "tax-percentage-with-fixed-charges-error": "The tax percentage cannot exceed 45\u00A0% with fixed charges. Please enter a valid value.",
-  "taxable-amount-column": "Taxable Amount",
+  "taxable-amount-column": "Taxable Amount\u00A0(€)",
   "tax-column": "Tax\u00A0(€)",
   "threshold-column": "Bracket",
   "title": "Income Tax Calculator",

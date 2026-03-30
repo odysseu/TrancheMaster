@@ -28,7 +28,7 @@
   "tax-percentage-prefix": "Le taux d'imposition effectif est\u00A0:\u00A0",
   "tax-percentage-with-deduction-error": "Le pourcentage d'imposition ne peut pas dépasser 40,50\u00A0% avec l'abattement. Veuillez entrer une valeur valide.",
   "tax-percentage-with-fixed-charges-error": "Le pourcentage d'imposition ne peut pas dépasser 45\u00A0% avec les charges fixes. Veuillez entrer une valeur valide.",
-  "taxable-amount-column": "Montant imposable",
+  "taxable-amount-column": "Montant imposable\u00A0(€)",
   "tax-column": "Impôt\u00A0(€)",
   "threshold-column": "Tranche",
   "title": "Calculateur d'Impôt sur le Revenu",

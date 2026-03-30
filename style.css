@@ -27,6 +27,8 @@
     --dark-table-header-text: #ffffffa3;
     --light-table-content-text: #000000b4;
     --dark-table-content-text: #ffffff96;
+    --dark-floating-placeholder-text-color: #d1dbe09e;
+    --light-floating-placeholder-text-color: #00000087;
     --dark-input-background: #213144;
     --light-input-background: #c3cfd7;
     --language-select-bg-light: #f0f0f0;
@@ -59,6 +61,7 @@ body {
     --language-select-border: var(--language-select-border-light);
     --language-select-arrow: var(--language-select-arrow-light);
     --results-text-color: var(--light-result-text-color);
+    --floating-placeholder-text-color: var(--light-floating-placeholder-text-color);
     font-family: Arial, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
@@ -86,6 +89,7 @@ body.dark-mode {
     --language-select-border: var(--language-select-border-dark);
     --language-select-arrow: var(--language-select-arrow-dark);
     --results-text-color: var(--dark-result-text-color);
+    --floating-placeholder-text-color: var(--dark-floating-placeholder-text-color);
 }
 
 /* Slider styles */
@@ -241,7 +245,7 @@ input:checked+.slider:before {
     left: 10px;
     top: calc(50% + 0.1em);
     transform: translateY(-50%);
-    color: var(--text-color);
+    color: var(--floating-placeholder-text-color);
     pointer-events: none;
     background-color: var(--input-background);
     /* padding: 0 4px; */
@@ -351,7 +355,7 @@ button:hover {
 .threshold-table td {
     padding: 8px;
     color: var(--table-content-text);
-    text-align: right;
+    text-align: center;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -396,7 +400,10 @@ button:hover {
 
 /* Year selector styling for header */
 .year-selector-container {
-    /* Removed margin-left to allow proper flexbox alignment */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-right: 10px;
 }
 
 .year-select {

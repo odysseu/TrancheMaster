@@ -1,29 +1,88 @@
-// taxCalculator.js - Pure calculation functions
-// Tax thresholds for different years
-export const TAX_THRESHOLDS_BY_YEAR = {
+// taxCalculator.js - Pure calculation functions with built-in data loading
+
+// Default tax thresholds data (includes years 2025-2026)
+const DEFAULT_TAX_THRESHOLDS = {
   2025: [
     { min: 0, max: 11497, rate: 0 },
     { min: 11498, max: 29315, rate: 0.11 },
-    { min: 29316, max: 83823, rate: 0.3 },
+    { min: 29316, max: 83823, rate: 0.30 },
     { min: 83824, max: 180294, rate: 0.41 },
     { min: 180295, max: Infinity, rate: 0.45 }
   ],
   2026: [
-    { min: 0, max: 11497, rate: 0 },
-    { min: 11498, max: 29315, rate: 0.11 },
-    { min: 29316, max: 83823, rate: 0.3 },
-    { min: 83824, max: 180294, rate: 0.41 },
-    { min: 180295, max: Infinity, rate: 0.45 }
+    { min: 0, max: 11600, rate: 0 },
+    { min: 11601, max: 29579, rate: 0.11 },
+    { min: 29580, max: 84577, rate: 0.30 },
+    { min: 84578, max: 181917, rate: 0.41 },
+    { min: 181918, max: Infinity, rate: 0.45 }
   ]
 };
 
+// Try to load from external JSON file if available, otherwise use defaults
+export let TAX_THRESHOLDS_BY_YEAR_FINAL = DEFAULT_TAX_THRESHOLDS;
+
+// Function to load data from JSON file (for browser environment)
+async function loadTaxDataFromJSON() {
+  try {
+    const response = await fetch('/data/tax_thresholds.json');
+    if (response.ok) {
+      const data = await response.json();
+      // Process the data to convert "Infinity" strings to actual Infinity
+      const processedData = {};
+      for (const year in data) {
+        processedData[year] = data[year].map(threshold => ({
+          min: threshold.min,
+          max: threshold.max === "Infinity" ? Infinity : threshold.max,
+          rate: threshold.rate
+        }));
+      }
+      TAX_THRESHOLDS_BY_YEAR_FINAL = processedData;
+      console.log('✅ Tax thresholds loaded from JSON file');
+      
+      // Update year selector with available years
+      updateYearSelector(processedData);
+    }
+  } catch (error) {
+    console.log('📄 Using built-in tax thresholds (JSON load failed):', error.message);
+  }
+}
+
+// Load data if we're in a browser environment
+if (typeof window !== 'undefined') {
+  loadTaxDataFromJSON();
+}
+
+// Function to update year selector with available years
+function updateYearSelector(years) {
+  const yearSelect = document.getElementById('year-select');
+  if (yearSelect) {
+    const sortedYears = Object.keys(years).sort((a, b) => b - a);
+    
+    // Clear existing options
+    yearSelect.innerHTML = '';
+    
+    // Add new options
+    sortedYears.forEach(year => {
+      const option = document.createElement('option');
+      option.value = year;
+      option.textContent = year;
+      if (year === sortedYears[0]) {
+        option.selected = true;
+      }
+      yearSelect.appendChild(option);
+    });
+    
+    console.log(`📅 Year selector updated with years: ${sortedYears.join(', ')}`);
+  }
+}
+
 // Default to 2025 for backward compatibility
-export const TAX_THRESHOLDS = TAX_THRESHOLDS_BY_YEAR[2025];
+export const TAX_THRESHOLDS = TAX_THRESHOLDS_BY_YEAR_FINAL[2025];
 
 // Pre-calculate tax information for each threshold for a given year
 export const THRESHOLD_DATA_BY_YEAR = {};
-for (const year in TAX_THRESHOLDS_BY_YEAR) {
-  const thresholds = TAX_THRESHOLDS_BY_YEAR[year];
+for (const year in TAX_THRESHOLDS_BY_YEAR_FINAL) {
+  const thresholds = TAX_THRESHOLDS_BY_YEAR_FINAL[year];
   const thresholdData = [];
   for (let i = 0; i < thresholds.length; i++) {
     const threshold = thresholds[i];
@@ -66,7 +125,7 @@ export function formatNumber(value) {
 
 // Calculate tax with breakdown by threshold
 export function calculateTaxWithBreakdown(taxableIncome, year = 2025) {
-  const thresholds = TAX_THRESHOLDS_BY_YEAR[year] || TAX_THRESHOLDS_BY_YEAR[2025];
+  const thresholds = TAX_THRESHOLDS_BY_YEAR_FINAL[year] || TAX_THRESHOLDS_BY_YEAR_FINAL[2025];
   let tax = 0;
   let thresholdTax = 0;
   let taxableAmount = 0;
@@ -107,7 +166,7 @@ export function findThresholdForTaxPercentage(taxPercentage, year = 2025) {
 
 // Calculate revenue from tax amount
 export function calculateNetRevenuFromTaxValue(taxAmount, chargesType, fixedCharges, year = 2025) {
-  const thresholds = TAX_THRESHOLDS_BY_YEAR[year] || TAX_THRESHOLDS_BY_YEAR[2025];
+  const thresholds = TAX_THRESHOLDS_BY_YEAR_FINAL[year] || TAX_THRESHOLDS_BY_YEAR_FINAL[2025];
   const thresholdData = THRESHOLD_DATA_BY_YEAR[year] || THRESHOLD_DATA_BY_YEAR[2025];
   // If tax is 0, return the maximum revenue for 0% tax
   let taxableIncome;
@@ -148,7 +207,7 @@ export function calculateNetRevenuFromTaxPercentage(taxPercentage, chargesType, 
   const taxRate = taxPercentage / 100;
   let taxableIncome;
   if (taxPercentage === 0) {
-    const thresholds = TAX_THRESHOLDS_BY_YEAR[year] || TAX_THRESHOLDS_BY_YEAR[2025];
+    const thresholds = TAX_THRESHOLDS_BY_YEAR_FINAL[year] || TAX_THRESHOLDS_BY_YEAR_FINAL[2025];
     taxableIncome = thresholds[0].max;
   } else {
     const numerator = threshold.cumulativeTax - threshold.rate * (threshold.min - 0);

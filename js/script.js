@@ -1,20 +1,9 @@
 // script.js - Main application file with DOM interactions
 import {
-  TAX_THRESHOLDS_BY_YEAR_FINAL as TAX_THRESHOLDS_BY_YEAR,
-  calculateTaxWithBreakdown,
-  calculateNetRevenuFromTaxValue,
-  findThresholdForTaxPercentage,
-  calculateNetRevenuFromTaxPercentage,
-  formatNumber
-} from './taxCalculator.js';
-import {
-  calculateRevenuToImpot,
-  formatRevenuToImpotResults,
   calculateAndFormatRevenuToImpot
 } from './revenuCalculator.js';
 import {
   calculateImpotToRevenu,
-  formatImpotToRevenuResults,
   calculateAndFormatImpotToRevenu
 } from './impotCalculator.js';
 

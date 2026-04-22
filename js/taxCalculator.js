@@ -49,7 +49,17 @@ async function loadTaxDataFromJSON() {
 
 // Load data if we're in a browser environment
 if (typeof window !== 'undefined') {
-  loadTaxDataFromJSON();
+  // Wait for DOM to be ready before initializing year selector
+  function initializeYearSelector() {
+    updateYearSelector(DEFAULT_TAX_THRESHOLDS);
+    loadTaxDataFromJSON();
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeYearSelector);
+  } else {
+    initializeYearSelector();
+  }
 }
 
 // Function to update year selector with available years

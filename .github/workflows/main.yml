@@ -38,10 +38,6 @@ jobs:
         uses: github/codeql-action/init@v4
         with:
           queries: security-extended
-      - name: Autobuild
-        uses: github/codeql-action/init@v4
-        with:
-          build-mode: autobuild
 
   # Test with npm the /tests/**.test.js files
   test:

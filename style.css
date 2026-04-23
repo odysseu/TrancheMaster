@@ -485,16 +485,11 @@ button:hover {
 @media (max-width: 480px) {
     .header-right {
         display: flex;
-        /* grid-template-columns: 1fr auto; */
-        /* grid-template-areas:
-            "year-selector toggle"
-            "language-selector toggle"; */
         gap: 6px;
         align-items: center;
-        width: 100%;
+        width: 150px;
         flex-wrap: nowrap;
-        /* overflow-x: auto; */
-        -webkit-overflow-scrolling: touch;
+        margin-right: 30px;
     }
     
     .year-selector-container {
@@ -529,9 +524,9 @@ button:hover {
     .switch {
         grid-area: toggle;
         justify-self: end;
-        align-self: start;
+        /* align-self: start; */
         margin-top: 0;
-        flex-shrink: 0;
+        flex-shrink: 0; /*TODO check that for shrinking the switch when small screen width*/
     }
     
 }

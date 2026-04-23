@@ -10,6 +10,7 @@ async function loadTranslations(lang) {
     const response = await fetch(`translations/${lang}.json`);
     translations = await response.json();
     updateLanguage();
+    updateSelectedLanguage();
     return translations;
   } catch (error) {
     console.error('Error loading translations:', error);
@@ -60,26 +61,60 @@ function getTranslation(key, ...args) {
   return translation;
 }
 
-// Initialize translations when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  // Load default language
-  loadTranslations(currentLanguage);
+// Function to update selected language display
+function updateSelectedLanguage() {
+  const selectedLangEl = document.querySelector('.selected-language');
+  if (selectedLangEl) {
+    selectedLangEl.textContent = translations[`language-flag-${currentLanguage}`] || '';
+  }
+}
 
-  // Add event listener for language change
-  const languageSelect = document.getElementById('language-select');
-  if (languageSelect) {
-    languageSelect.addEventListener('change', () => {
-      currentLanguage = languageSelect.value;
-      localStorage.setItem('language', currentLanguage);
-      loadTranslations(currentLanguage);
+// Initialize Language Selector when DOM is loaded
+document.addEventListener('DOMContentLoaded', async () => {
+  const customLanguageSelect = document.querySelector('.custom-language-select');
+  const selectedLanguageEl = document.querySelector('.selected-language');
+  const languageOptions = document.querySelectorAll('.language-option');
+
+  // Load saved language preference first
+  const savedLanguage = localStorage.getItem('language');
+  if (savedLanguage) {
+    currentLanguage = savedLanguage;
+  }
+
+  // Load default language and wait for it
+  await loadTranslations(currentLanguage);
+
+  // Add event listener for custom language selector
+  if (customLanguageSelect && selectedLanguageEl) {
+    const closeDropdown = () => customLanguageSelect.classList.remove('open');
+
+    // Toggle dropdown on click
+    selectedLanguageEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      customLanguageSelect.classList.toggle('open');
     });
 
-    // Load saved language preference
-    const savedLanguage = localStorage.getItem('language');
-    if (savedLanguage) {
-      currentLanguage = savedLanguage;
-      languageSelect.value = currentLanguage;
-    }
+    // Handle language option selection
+    languageOptions.forEach(option => {
+      option.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        currentLanguage = option.dataset.value;
+        localStorage.setItem('language', currentLanguage);
+        await loadTranslations(currentLanguage);
+        closeDropdown();
+      });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', closeDropdown);
+
+    // Prevent dropdown from closing when clicking inside
+    customLanguageSelect.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    // Initialize selected language display with flag only
+    updateSelectedLanguage();
   }
 });
 

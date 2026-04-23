@@ -23,16 +23,21 @@
         </div>
         <h1 data-i18n="main-title"></h1>
         <div class="header-right">
-            <div class="year-selector-container">
+            <div id="year-selector" class="year-selector-container">
                 <select id="year-select" class="year-select">
                     <option value="2026" selected>2026</option>
                 </select>
+                <span class="dropdown-arrow"></span>
             </div>
-            <div class="language-selector-container">
-                <select id="language-select">
-                    <option value="fr" selected data-i18n="language-select-fr"></option>
-                    <option value="en" data-i18n="language-select-en"></option>
-                </select>
+            <div id="language-selector" class="language-selector-container">
+                <div class="custom-language-select">
+                    <div class="selected-language">🇫🇷</div>
+                    <div class="language-dropdown">
+                        <div class="language-option" data-value="fr">🇫🇷 Français</div>
+                        <div class="language-option" data-value="en">🇬🇧 English</div>
+                    </div>
+                </div>
+                <span class="dropdown-arrow"></span>
             </div>
             <label class="switch">
                 <input type="checkbox" id="dark-mode-toggle">

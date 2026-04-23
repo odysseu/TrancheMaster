@@ -7,6 +7,8 @@
   "fixed-charges-reverse-btn": "Actual Expenses",
   "fixed-charges-reverse-placeholder": "Actual expenses amount\u00A0(€)",
   "impot-to-revenu-btn": "Tax → Income",
+  "language-flag-en": "🇬🇧",
+  "language-name-en": "English",
   "language-select-en": "🇬🇧 English",
   "main-title": "Income Tax Calculator",
   "max-contributor-message": "You are a great contributor! You have exceeded the highest tax bracket.",

@@ -1,4 +1,4 @@
-// script.js - Main application file with DOM interactions
+// main.js - Main application file with DOM interactions
 import {
   calculateAndFormatRevenuToImpot
 } from './revenuCalculator.js';

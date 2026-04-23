@@ -21,7 +21,7 @@ import {
   calculateNetRevenuFromTaxPercentage
 } from '../js/taxCalculator.js';
 
-// Mock the taxCalculator module to match what script.js actually imports
+// Mock the taxCalculator module to match what main.js actually imports
 jest.mock('../js/taxCalculator.js', () => ({
   TAX_THRESHOLDS_BY_YEAR_FINAL: {
     2025: [
@@ -96,7 +96,7 @@ jest.mock('../js/impotCalculator.js', () => {
   };
 });
 
-describe('script.js DOM Interactions', () => {
+describe('main.js DOM Interactions', () => {
   let container;
 
   beforeAll(() => {
@@ -126,8 +126,8 @@ describe('script.js DOM Interactions', () => {
     // Clear the module cache to ensure fresh imports
     jest.resetModules();
 
-    // Import script.js after mocking
-    require('../js/script.js');
+    // Import main.js after mocking
+    require('../js/main.js');
     
     // Manually trigger DOMContentLoaded event to initialize the app
     const event = new Event('DOMContentLoaded');
@@ -142,8 +142,8 @@ describe('script.js DOM Interactions', () => {
     const html = readFileSync(resolve(__dirname, '../index.html'), 'utf8');
     document.body.innerHTML = html;
 
-    // Import script.js after mocking and setting up the DOM
-    const scriptModule = require('../js/script.js');
+    // Import main.js after mocking and setting up the DOM
+    const mainModule = require('../js/main.js');
     
     // Manually trigger DOMContentLoaded event to initialize the app
     const event = new Event('DOMContentLoaded');
@@ -288,6 +288,73 @@ describe('script.js DOM Interactions', () => {
 
       expect(document.body.classList.contains('dark-mode')).toBe(false);
       expect(localStorage.getItem('dark-mode')).toBe('disabled');
+    });
+  });
+
+  describe('Menu Button Handlers', () => {
+    it('should switch to revenu to impot mode', () => {
+      const impotToRevenuBtn = document.getElementById('impot-to-revenu-btn');
+      
+      impotToRevenuBtn.click();
+      
+      expect(document.getElementById('revenu-to-impot-section').classList.contains('active')).toBe(false);
+      expect(document.getElementById('impot-to-revenu-section').classList.contains('active')).toBe(true);
+    });
+
+    it('should show fixed charges group when fixed charges button clicked', () => {
+      const fixedChargesBtn = document.getElementById('fixed-charges-btn');
+      const fixedChargesGroup = document.getElementById('fixed-charges-group');
+      
+      fixedChargesBtn.click();
+      
+      expect(fixedChargesGroup.style.display).toBe('block');
+      expect(fixedChargesBtn.classList.contains('active')).toBe(true);
+    });
+
+    it('should switch to monthly option', () => {
+      const monthlyBtn = document.getElementById('monthly-option-btn');
+      
+      monthlyBtn.click();
+      
+      expect(monthlyBtn.classList.contains('active')).toBe(true);
+      expect(document.getElementById('yearly-option-btn').classList.contains('active')).toBe(false);
+    });
+
+    it('should switch to yearly option reverse', () => {
+      const yearlyReverseBtn = document.getElementById('yearly-option-reversed-btn');
+      
+      yearlyReverseBtn.click();
+      
+      expect(yearlyReverseBtn.classList.contains('active')).toBe(true);
+    });
+
+    it('should switch to fixed charges reverse mode', () => {
+      const fixedChargesReverseBtn = document.getElementById('fixed-charges-reverse-btn');
+      const fixedChargesGroupReverse = document.getElementById('fixed-charges-group-reverse');
+      
+      fixedChargesReverseBtn.click();
+      
+      expect(fixedChargesGroupReverse.style.display).toBe('block');
+      expect(fixedChargesReverseBtn.classList.contains('active')).toBe(true);
+    });
+  });
+
+  describe('Calculation Function Registration', () => {
+    it('should register calculation functions with translation system', () => {
+      expect(window.translationSystem.registerCalculationFunctions).toHaveBeenCalled();
+      expect(typeof window.calculationFunctions.revenuFunc).toBe('function');
+      expect(typeof window.calculationFunctions.impotFunc).toBe('function');
+    });
+
+    it('should call revenu calculation function when registered function is invoked', () => {
+      expect(typeof window.calculationFunctions.revenuFunc).toBe('function');
+      // Just verify it's callable without throwing
+      expect(() => window.calculationFunctions.revenuFunc()).not.toThrow();
+    });
+
+    it('should call impot calculation function when registered function is invoked', () => {
+      expect(typeof window.calculationFunctions.impotFunc).toBe('function');
+      expect(() => window.calculationFunctions.impotFunc()).not.toThrow();
     });
   });
 });

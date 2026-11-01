@@ -1,0 +1,61 @@
+name: Update tax data
+
+# Quarterly automation, aligned with the Renovate schedule (renovate.json):
+# once every 4 months starting in March, i.e. on the 1st of March, July
+# and November. This workflow proposes the *tax data* update as a PR;
+# Renovate proposes the *package* updates on the same cadence.
+on:
+  schedule:
+    # 05:00 UTC = 06:00 in Paris on 1 March (CET); 07:00 on 1 July (CEST)
+    - cron: '0 5 1 3,7,11 *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-tax-data
+  cancel-in-progress: false
+
+jobs:
+  update-tax-data:
+    name: Fetch latest tax brackets and open a PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 'latest'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Test the updater (must stay green)
+        run: npm run test:updater
+
+      - name: Update tax data from Wikipedia
+        run: node js/update_tax_data.js
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/update-tax-data
+          delete-branch: true
+          title: 'chore: quarterly tax data update (barèmes IR)'
+          commit-message: 'chore: update tax brackets from Wikipedia'
+          body: |
+            Quarterly automatic update of the income-tax brackets, fetched from
+            Wikipedia (Barèmes de l'impôt sur le revenu en France).
+
+            Changed files:
+            - `data/tax_thresholds.json`
+            - `DEFAULT_TAX_THRESHOLDS` block in `js/taxCalculator.js`
+            - year selector in `index.html`
+
+            Package updates are proposed separately by Renovate on the same
+            quarterly schedule (1st of March, July, November).
+          labels: chore

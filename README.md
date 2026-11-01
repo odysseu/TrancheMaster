@@ -49,6 +49,7 @@ TrancheMaster helps you determine your tax bracket based on your income, or esti
 - [💻 Local Deployment](#deploy-and-try-locally-)
 - [🧪 Testing](#testing-)
 - [🔄 Tax Data Updater](#tax-data-updater-)
+- [⏰ Quarterly Automation](#scheduled-updates-quarterly-starting-in-march)
 
 ## App Link 🚀
 
@@ -205,13 +206,18 @@ node update_tax_data.js --dry-run
 ```
 Shows what changes would be made without modifying any files.
 
-### Scheduled Updates
+### Scheduled Updates (quarterly, starting in March)
 
-For automatic monthly updates, add to your crontab:
+Both the **tax data** and the **package dependencies** are updated once every 4 months, on the **1st of March, July and November**:
+
+- **Tax data**: the scheduled workflow [.github/workflows/update-tax-data.yml](.github/workflows/update-tax-data.yml) runs `node js/update_tax_data.js` and opens a PR with the new brackets (`data/tax_thresholds.json`, the `DEFAULT_TAX_THRESHOLDS` block in `js/taxCalculator.js`, the year selector in `index.html`). You can also trigger it manually from the *Actions* tab (*Update tax data* → *Run workflow*).
+- **Packages**: [Renovate](renovate.json) is scheduled with the same cadence (`"schedule": ["* 6 1 3,7,11 *"]`, `Europe/Paris`), so its dependency PRs are only created on those dates.
+
+To self-host the data update on your own server instead, add to your crontab:
 
 ```bash
-# Run monthly on the 1st at 2 AM
-0 2 1 * * cd /path/to/project && node js/update_tax_data.js >> /var/log/tax_updater.log 2>&1
+# Run every 4 months on the 1st at 2 AM (March, July, November)
+0 2 1 3,7,11 * cd /path/to/project && node js/update_tax_data.js >> /var/log/tax_updater.log 2>&1
 ```
 
 ### Manual Execution Options

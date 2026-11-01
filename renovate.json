@@ -2,5 +2,9 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
+  ],
+  "timezone": "Europe/Paris",
+  "schedule": [
+    "* 6 1 3,7,11 *"
   ]
 }

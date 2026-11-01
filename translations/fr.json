@@ -38,5 +38,8 @@
   "yearly-option": "Annuel",
   "year-select-placeholder": "Année fiscale",
   "zero-tax-message": "Avec 0% d'imposition, votre revenu annuel est inférieur à {0}\u00A0€\u00A0({1}\u00A0€/mois).",
-  "cumulative-tax-column": "Impôt cumulé\u00A0(€)"
+  "cumulative-tax-column": "Impôt cumulé\u00A0(€)",
+  "dark-mode-aria": "Basculer en mode sombre",
+  "language-selector-aria": "Choisir la langue",
+  "year-select-aria": "Choisir l'année fiscale"
 }

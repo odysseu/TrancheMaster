@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="title"></title>
     <link rel="apple-touch-icon" sizes="180x180" href="logos/logo-TrancheMaster.png">
-    <link rel="canonical" href="https://odysseu.github.io/HabitatCalc/" />
+    <link rel="canonical" href="https://odysseu.github.io/TrancheMaster/" />
     <link rel="manifest" href="/TrancheMaster/webmanifest.json">
     <link rel="stylesheet" href="style.css">
     <link id="favicon" rel="icon" href="logos/favicon.ico" type="image/x-icon">
@@ -24,23 +24,49 @@
         <h1 data-i18n="main-title"></h1>
         <div class="header-right">
             <div id="year-selector" class="year-selector-container">
-                <select id="year-select" class="year-select">
+                <select id="year-select" class="year-select" data-i18n-aria="year-select-aria">
                     <option value="2026" selected>2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                    <option value="2020">2020</option>
+                    <option value="2019">2019</option>
+                    <option value="2018">2018</option>
+                    <option value="2017">2017</option>
+                    <option value="2016">2016</option>
+                    <option value="2015">2015</option>
+                    <option value="2014">2014</option>
+                    <option value="2013">2013</option>
+                    <option value="2012">2012</option>
+                    <option value="2011">2011</option>
+                    <option value="2010">2010</option>
+                    <option value="2009">2009</option>
+                    <option value="2008">2008</option>
+                    <option value="2007">2007</option>
+                    <option value="2006">2006</option>
+                    <option value="2005">2005</option>
+                    <option value="2004">2004</option>
+                    <option value="2003">2003</option>
+                    <option value="2002">2002</option>
                 </select>
                 <span class="dropdown-arrow"></span>
             </div>
             <div id="language-selector" class="language-selector-container">
-                <div class="custom-language-select">
+                <div class="custom-language-select" role="button" tabindex="0" data-i18n-aria="language-selector-aria" aria-haspopup="listbox">
                     <div class="selected-language">🇫🇷</div>
-                    <div class="language-dropdown">
-                        <div class="language-option" data-value="fr">🇫🇷 Français</div>
-                        <div class="language-option" data-value="en">🇬🇧 English</div>
+                    <div class="language-dropdown" role="listbox">
+                        <div class="language-option" role="option" data-value="fr">🇫🇷 Français</div>
+                        <div class="language-option" role="option" data-value="en">🇬🇧 English</div>
+                        <div class="language-option" role="option" data-value="es">🇪🇸 Español</div>
+                        <div class="language-option" role="option" data-value="de">🇩🇪 Deutsch</div>
                     </div>
                 </div>
                 <span class="dropdown-arrow"></span>
             </div>
             <label class="switch">
-                <input type="checkbox" id="dark-mode-toggle">
+                <input type="checkbox" id="dark-mode-toggle" data-i18n-aria="dark-mode-aria">
                 <span class="slider round"></span>
             </label>
         </div>
@@ -54,10 +80,10 @@
 
         <!-- Revenu → Impôt section -->
         <div id="revenu-to-impot-section" class="section active">
-            <div class="input-group">
+            <label class="input-group">
                 <input type="number" id="revenu" placeholder=" " inputmode="decimal" step="0.01">
                 <span class="floating-placeholder" data-i18n="revenu-placeholder"></span>
-            </div>
+            </label>
             <div class="input-group">
                 <div class="menu">
                     <button id="yearly-option-btn" class="menu-btn" data-i18n="yearly-option"></button>
@@ -69,10 +95,10 @@
                 <button id="abattement-btn" class="menu-btn active" data-i18n="abattement-btn"></button>
                 <button id="fixed-charges-btn" class="menu-btn" data-i18n="fixed-charges-btn"></button>
             </div>
-            <div class="input-group" id="fixed-charges-group" style="display: none;">
+            <label class="input-group" id="fixed-charges-group" style="display: none;">
                 <input type="number" id="fixed-charges" placeholder=" " inputmode="decimal" step="0.01">
                 <span class="floating-placeholder" data-i18n="fixed-charges-placeholder"></span>
-            </div>
+            </label>
             <div class="results">
                 <h2 data-i18n="results-title"></h2>
                 <p id="tax-percentage" data-i18n="tax-percentage-prefix"></p>
@@ -100,14 +126,14 @@
                 <button id="tax-percentage-btn" class="menu-btn active" data-i18n="tax-percentage-btn"></button>
                 <button id="tax-amount-btn" class="menu-btn" data-i18n="tax-amount-btn"></button>
             </div>
-            <div class="input-group" id="tax-percentage-group">
+            <label class="input-group" id="tax-percentage-group">
                 <input type="number" id="tax-percentage-input" inputmode="decimal" step="0.01" placeholder=" ">
                 <span class="floating-placeholder" data-i18n="tax-percentage-placeholder"></span>
-            </div>
-            <div class="input-group tax-type-group hidden" id="tax-amount-group">
+            </label>
+            <label class="input-group tax-type-group hidden" id="tax-amount-group">
                 <input type="number" id="tax-amount" inputmode="decimal" step="0.01" placeholder=" ">
                 <span class="floating-placeholder" data-i18n="tax-amount-placeholder"></span>
-            </div>
+            </label>
             <div class="input-group tax-type-group hidden" id="tax-type-group">
                 <div class="input-group">
                     <div class="menu">
@@ -124,10 +150,10 @@
                     data-i18n="abattement-reverse-btn"></button>
                 <button id="fixed-charges-reverse-btn" class="menu-btn" data-i18n="fixed-charges-reverse-btn"></button>
             </div>
-            <div class="input-group" id="fixed-charges-group-reverse" style="display: none;">
+            <label class="input-group" id="fixed-charges-group-reverse" style="display: none;">
                 <input type="number" id="fixed-charges-reverse" inputmode="decimal" step="0.01" placeholder=" ">
                 <span class="floating-placeholder" data-i18n="fixed-charges-reverse-placeholder"></span>
-            </div>
+            </label>
             <div class="results">
                 <h2 data-i18n="results-title"></h2>
                 <p id="calculated-revenu" data-i18n="calculated-revenu-prefix"></p>

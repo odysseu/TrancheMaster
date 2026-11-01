@@ -38,5 +38,8 @@
   "yearly-option": "Yearly",
   "year-select-placeholder": "Tax Year",
   "zero-tax-message": "With 0% tax, your annual income is less than {0}\u00A0€\u00A0({1}\u00A0€/month).",
-  "cumulative-tax-column": "Cumulative Tax\u00A0(€)"
+  "cumulative-tax-column": "Cumulative Tax\u00A0(€)",
+  "dark-mode-aria": "Toggle dark mode",
+  "language-selector-aria": "Select language",
+  "year-select-aria": "Select tax year"
 }

@@ -39,6 +39,9 @@ jobs:
         with:
           queries: security-extended
 
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+
   # Test with npm the /tests/**.test.js files
   test:
     needs: analyze

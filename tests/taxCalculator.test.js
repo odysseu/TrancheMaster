@@ -184,7 +184,8 @@ describe('Tax Calculation Functions', () => {
         it('should return correct revenue for 2% tax with abattement', () => {
             const { threshold } = findThresholdForTaxPercentage(2);
             const result = calculateNetRevenuFromTaxPercentage(2, 'abattement', 0, { threshold });
-            expect(parseFloat(result.yearly)).toBeCloseTo(15614.57);
+            // Exact solution of 0.02 * I = 0.11 * (I - 11497), then I / 0.9
+            expect(parseFloat(result.yearly)).toBeCloseTo(15613.21);
         });
     });
 

@@ -117,7 +117,7 @@ Special thanks to [js-coverage-badges](https://github.com/marialuisacp/js-covera
 - Go to the project root :
 
   ```sh
-  cd HabitatCalc
+  cd TrancheMaster
   ```
 
 - Install Dependencies:
@@ -152,14 +152,12 @@ The Tax Data Updater script fetches the latest tax bracket information and updat
 
 ### Quick Start
 
-Run the updater in **2 simple steps**:
+Run the updater from the **repo root**:
 
 ```bash
-# 1. Navigate to js directory
-cd js
-
-# 2. Run the updater
-node update_tax_data.js
+npm run update:tax-data
+# or equivalently:
+node js/update_tax_data.js
 ```
 
 That's it! The script will:
@@ -170,9 +168,10 @@ That's it! The script will:
 
 ### Features
 
-- **Automatic Data Fetching**: Retrieves from French Government Tax Portal and Legifrance
-- **Robust Parsing**: Handles table and text-based tax data formats
-- **Fallback System**: Uses current data if online sources are unavailable
+- **Automatic Data Fetching**: Retrieves the barème tables from French Wikipedia ([Barèmes de l'impôt sur le revenu en France](https://fr.wikipedia.org/wiki/Bar%C3%A8mes_de_l%27imp%C3%B4t_sur_le_revenu_en_France)) — the only source used
+- **Robust Parsing**: Parses every euro-denominated barème table of the article (current + historical, including multi-year tables like "2010 et 2011"); franc (FF) tables and unrelated tables (e.g. the exceptional contribution on high incomes) are ignored
+- **Year convention**: Wikipedia labels a table by the income year ("revenus 2025"), the app by the tax year, so app year = Wikipedia year + 1
+- **Fallback System**: Uses built-in data if the online source is unavailable
 - **Complete Updates**: JSON data, HTML selector, and JavaScript calculator
 - **Comprehensive Testing**: Full test suite included
 - **Safe Testing**: Dry-run mode and custom output paths prevent accidental data loss
@@ -183,7 +182,7 @@ That's it! The script will:
 The updater includes several safety mechanisms:
 
 **Command Line Arguments:**
-- `--test` or `-t` - Use test output files (writes to `data/test_tax_thresholds.json`)
+- `--test` or `-t` - Use test output files only (`data/test_tax_thresholds.json`, `test_index.html`, `js/test_taxCalculator.js`) — production files are never touched
 - `--dry-run` or `-n` - Preview changes without modifying files
 - `--test --dry-run` - Preview test mode changes
 
@@ -212,51 +211,50 @@ For automatic monthly updates, add to your crontab:
 
 ```bash
 # Run monthly on the 1st at 2 AM
-0 2 1 * * cd /path/to/project/js && node update_tax_data.js >> /var/log/tax_updater.log 2>&1
+0 2 1 * * cd /path/to/project && node js/update_tax_data.js >> /var/log/tax_updater.log 2>&1
 ```
 
 ### Manual Execution Options
 
 **Direct Node.js:**
 ```bash
-cd js
-node update_tax_data.js
+node js/update_tax_data.js
 ```
 
 **Test Mode (Safe Testing):**
 ```bash
-cd js
-node update_tax_data.js --test
+node js/update_tax_data.js --test
 # or
-node update_tax_data.js -t
+node js/update_tax_data.js -t
 ```
-This writes output to `data/test_tax_thresholds.json` instead of the production file.
+This writes output to `data/test_tax_thresholds.json`, `test_index.html` and `js/test_taxCalculator.js` instead of the production files.
 
 **Dry Run (Preview Changes):**
 ```bash
-cd js
-node update_tax_data.js --dry-run
+node js/update_tax_data.js --dry-run
 # or
-node update_tax_data.js -n
+node js/update_tax_data.js -n
 ```
 Shows what changes would be made without modifying any files.
 
 **Combined Test + Dry Run:**
 ```bash
-cd js
-node update_tax_data.js --test --dry-run
+node js/update_tax_data.js --test --dry-run
 ```
 Preview changes that would be made in test mode.
 
 **Custom Output Paths:**
 ```bash
-cd js
-TAX_DATA_OUTPUT_JSON="/tmp/test_tax_data.json" node update_tax_data.js
+TAX_DATA_OUTPUT_JSON="/tmp/test_tax_data.json" node js/update_tax_data.js
 ```
 
-**Run Tests:**
+**Test the updater itself (writes only to temp files):**
 ```bash
-cd js
+npm run test:updater
+```
+
+**Run the app test suite:**
+```bash
 npm test
 ```
 
@@ -264,26 +262,21 @@ npm test
 
 **Dependencies missing?**
 ```bash
-cd scripts
 npm install
-```
-
-**Permission issues?**
-```bash
-chmod +x scripts/*.sh scripts/*.js
 ```
 
 **Network problems?** The script automatically falls back to current data if online sources are unavailable.
 
 ### Data Sources
 
-The script fetches from:
-- 🇫🇷 French Government Tax Portal: [impots.gouv.fr](https://www.impots.gouv.fr/)
-- 📜 Official Journal of France: [legifrance.gouv.fr](https://www.legifrance.gouv.fr/)
+The script fetches from a single source:
+- 🇫🇷 Wikipedia: [Barèmes de l'impôt sur le revenu en France](https://fr.wikipedia.org/wiki/Bar%C3%A8mes_de_l%27imp%C3%B4t_sur_le_revenu_en_France)
+
+For reference, the official sources are [service-public.fr](https://www.service-public.fr/particuliers/actualites/A18045) and [legifrance.gouv.fr](https://www.legifrance.gouv.fr/).
 
 ### Manual Updates
 
 If automatic fetching fails, you can manually edit:
 1. `data/tax_thresholds.json` - Update the JSON data
-2. `js/taxCalculator.js` - Update the `TAX_THRESHOLDS_BY_YEAR` object
+2. `js/taxCalculator.js` - Update the `DEFAULT_TAX_THRESHOLDS` block (between the `BEGIN`/`END DEFAULT_TAX_THRESHOLDS` markers)
 3. `index.html` - Update the year selector options

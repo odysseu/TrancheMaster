@@ -1,3 +1,6 @@
 node_modules/*
 !node_modules/.package-lock.json
 data/test*.json
+js/test_taxCalculator.js
+test_index.html
+coverage/

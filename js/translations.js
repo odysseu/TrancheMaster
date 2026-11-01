@@ -36,6 +36,14 @@ function updateLanguage() {
     }
   });
 
+  // Update aria-labels
+  document.querySelectorAll('[data-i18n-aria]').forEach(element => {
+    const key = element.getAttribute('data-i18n-aria');
+    if (translations[key]) {
+      element.setAttribute('aria-label', translations[key]);
+    }
+  });
+
   // Update HTML lang attribute
   document.documentElement.lang = currentLanguage;
 
@@ -125,11 +133,13 @@ function registerCalculationFunctions(revenuFunc, impotFunc) {
 }
 
 // Export functions for use in other scripts
+// currentLanguage and translations are exposed as getters so consumers
+// always see the live values after a language switch
 window.translationSystem = {
   getTranslation,
   loadTranslations,
   updateLanguage,
-  currentLanguage,
-  translations,
+  get currentLanguage() { return currentLanguage; },
+  get translations() { return translations; },
   registerCalculationFunctions
 };

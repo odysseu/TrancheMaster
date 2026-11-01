@@ -3,17 +3,8 @@ import {
   calculateAndFormatRevenuToImpot
 } from './revenuCalculator.js';
 import {
-  calculateImpotToRevenu,
   calculateAndFormatImpotToRevenu
 } from './impotCalculator.js';
-
-// DOM elements
-let revenuInput, fixedChargesInput,
-  taxPercentageInput, taxAmountInput, fixedChargesReverseInput, // taxTypeSelect,
-  taxPercentageElement, thresholdBreakdownElement, totalTaxElement, missingMoneyElement,
-  calculatedRevenuElement, abattementBtn, fixedChargesBtn, taxPercentageBtn, taxAmountBtn,
-  abattementReverseBtn, fixedChargesReverseBtn, yearlyOptionBtn, monthlyOptionBtn, yearlyOptionReverseBtn, monthlyOptionReverseBtn,
-  yearSelect;
 
 // Initialize the application
 document.addEventListener("DOMContentLoaded", async () => {
@@ -39,32 +30,31 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // Get DOM elements
-  revenuInput = document.getElementById("revenu");
-  fixedChargesInput = document.getElementById("fixed-charges");
-  taxPercentageInput = document.getElementById("tax-percentage-input");
-  taxAmountInput = document.getElementById("tax-amount");
-  // taxTypeSelect = document.getElementById("tax-type");
-  fixedChargesReverseInput = document.getElementById("fixed-charges-reverse");
-  yearSelect = document.getElementById("year-select");
+  const revenuInput = document.getElementById("revenu");
+  const fixedChargesInput = document.getElementById("fixed-charges");
+  const taxPercentageInput = document.getElementById("tax-percentage-input");
+  const taxAmountInput = document.getElementById("tax-amount");
+  const fixedChargesReverseInput = document.getElementById("fixed-charges-reverse");
+  const yearSelect = document.getElementById("year-select");
 
   // Get result elements
-  taxPercentageElement = document.getElementById("tax-percentage");
-  thresholdBreakdownElement = document.getElementById("threshold-breakdown");
-  totalTaxElement = document.getElementById("total-tax");
-  missingMoneyElement = document.getElementById("missing-money");
-  calculatedRevenuElement = document.getElementById("calculated-revenu");
+  const taxPercentageElement = document.getElementById("tax-percentage");
+  const thresholdBreakdownElement = document.getElementById("threshold-breakdown");
+  const totalTaxElement = document.getElementById("total-tax");
+  const missingMoneyElement = document.getElementById("missing-money");
+  const calculatedRevenuElement = document.getElementById("calculated-revenu");
 
   // Get menu buttons
-  abattementBtn = document.getElementById("abattement-btn");
-  fixedChargesBtn = document.getElementById("fixed-charges-btn");
-  taxPercentageBtn = document.getElementById("tax-percentage-btn");
-  taxAmountBtn = document.getElementById("tax-amount-btn");
-  abattementReverseBtn = document.getElementById("abattement-reverse-btn");
-  fixedChargesReverseBtn = document.getElementById("fixed-charges-reverse-btn");
-  yearlyOptionBtn = document.getElementById("yearly-option-btn");
-  monthlyOptionBtn = document.getElementById("monthly-option-btn");
-  yearlyOptionReverseBtn = document.getElementById("yearly-option-reversed-btn");
-  monthlyOptionReverseBtn = document.getElementById("monthly-option-reversed-btn");
+  const abattementBtn = document.getElementById("abattement-btn");
+  const fixedChargesBtn = document.getElementById("fixed-charges-btn");
+  const taxPercentageBtn = document.getElementById("tax-percentage-btn");
+  const taxAmountBtn = document.getElementById("tax-amount-btn");
+  const abattementReverseBtn = document.getElementById("abattement-reverse-btn");
+  const fixedChargesReverseBtn = document.getElementById("fixed-charges-reverse-btn");
+  const yearlyOptionBtn = document.getElementById("yearly-option-btn");
+  const monthlyOptionBtn = document.getElementById("monthly-option-btn");
+  const yearlyOptionReverseBtn = document.getElementById("yearly-option-reversed-btn");
+  const monthlyOptionReverseBtn = document.getElementById("monthly-option-reversed-btn");
 
   // Get section elements
   const revenuToImpotBtn = document.getElementById("revenu-to-impot-btn");
@@ -82,98 +72,80 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Initialize visibility on page load
   taxTypeGroup.classList.add("hidden");
 
+  // Single recalculation helpers: read current UI state, then calculate + format
+  const recalculateRevenuToImpot = () => {
+    calculateAndFormatRevenuToImpot(
+      revenuInput.value, fixedChargesInput.value,
+      yearlyOptionBtn.classList.contains("active"),
+      abattementBtn.classList.contains("active"),
+      yearSelect.value,
+      taxPercentageElement, thresholdBreakdownElement, totalTaxElement, missingMoneyElement
+    );
+  };
+
+  const recalculateImpotToRevenu = () => {
+    calculateAndFormatImpotToRevenu(
+      taxPercentageInput.value, taxAmountInput.value, fixedChargesReverseInput.value,
+      taxPercentageBtn.classList.contains("active"),
+      abattementReverseBtn.classList.contains("active"),
+      yearlyOptionReverseBtn.classList.contains("active"),
+      yearSelect.value, calculatedRevenuElement
+    );
+  };
+
+  // Helper to activate exactly one button within a menu group
+  const activateButton = (buttons, activeBtn) => {
+    buttons.forEach(btn => btn.classList.toggle("active", btn === activeBtn));
+  };
+
   // Main mode menu toggle
   revenuToImpotBtn.addEventListener("click", () => {
     revenuToImpotSection.classList.add("active");
     impotToRevenuSection.classList.remove("active");
-    revenuToImpotBtn.classList.add("active");
-    impotToRevenuBtn.classList.remove("active");
-    const isYearly = yearlyOptionBtn.classList.contains("active");
-    const useAbattement = abattementBtn.classList.contains("active");
-    calculateAndFormatRevenuToImpot(
-      revenuInput.value, fixedChargesInput.value, isYearly, useAbattement, yearSelect.value,
-      taxPercentageElement, thresholdBreakdownElement, totalTaxElement, missingMoneyElement
-    );
+    activateButton([revenuToImpotBtn, impotToRevenuBtn], revenuToImpotBtn);
+    recalculateRevenuToImpot();
   });
 
   impotToRevenuBtn.addEventListener("click", () => {
     impotToRevenuSection.classList.add("active");
     revenuToImpotSection.classList.remove("active");
-    impotToRevenuBtn.classList.add("active");
-    revenuToImpotBtn.classList.remove("active");
-    calculateImpotToRevenu();
+    activateButton([revenuToImpotBtn, impotToRevenuBtn], impotToRevenuBtn);
+    recalculateImpotToRevenu();
   });
 
   // Revenu → Impôt: 10% or charges menu
   abattementBtn.addEventListener("click", () => {
     fixedChargesGroup.style.display = "none";
-    abattementBtn.classList.add("active");
-    fixedChargesBtn.classList.remove("active");
-    const isYearly = yearlyOptionBtn.classList.contains("active");
-    const useAbattement = true;
-    calculateAndFormatRevenuToImpot(
-      revenuInput.value, fixedChargesInput.value, isYearly, useAbattement, yearSelect.value,
-      taxPercentageElement, thresholdBreakdownElement, totalTaxElement, missingMoneyElement
-    );
+    activateButton([abattementBtn, fixedChargesBtn], abattementBtn);
+    recalculateRevenuToImpot();
   });
 
   fixedChargesBtn.addEventListener("click", () => {
     fixedChargesGroup.style.display = "block";
-    fixedChargesBtn.classList.add("active");
-    abattementBtn.classList.remove("active");
-    const isYearly = yearlyOptionBtn.classList.contains("active");
-    const useAbattement = false;
-    calculateAndFormatRevenuToImpot(
-      revenuInput.value, fixedChargesInput.value, isYearly, useAbattement, yearSelect.value,
-      taxPercentageElement, thresholdBreakdownElement, totalTaxElement, missingMoneyElement
-    );
+    activateButton([abattementBtn, fixedChargesBtn], fixedChargesBtn);
+    recalculateRevenuToImpot();
   });
 
-  // Impôt → Revenu: Yearly or monthly menu
+  // Revenu → Impôt: Yearly or monthly menu
   yearlyOptionBtn.addEventListener("click", () => {
-    yearlyOptionBtn.classList.add("active");
-    monthlyOptionBtn.classList.remove("active");
-    const isYearly = true;
-    const useAbattement = abattementBtn.classList.contains("active");
-    calculateAndFormatRevenuToImpot(
-      revenuInput.value, fixedChargesInput.value, isYearly, useAbattement, yearSelect.value,
-      taxPercentageElement, thresholdBreakdownElement, totalTaxElement, missingMoneyElement
-    );
+    activateButton([yearlyOptionBtn, monthlyOptionBtn], yearlyOptionBtn);
+    recalculateRevenuToImpot();
   });
 
   monthlyOptionBtn.addEventListener("click", () => {
-    monthlyOptionBtn.classList.add("active");
-    yearlyOptionBtn.classList.remove("active");
-    const isYearly = false;
-    const useAbattement = abattementBtn.classList.contains("active");
-    calculateAndFormatRevenuToImpot(
-      revenuInput.value, fixedChargesInput.value, isYearly, useAbattement, yearSelect.value,
-      taxPercentageElement, thresholdBreakdownElement, totalTaxElement, missingMoneyElement
-    );
+    activateButton([yearlyOptionBtn, monthlyOptionBtn], monthlyOptionBtn);
+    recalculateRevenuToImpot();
   });
 
+  // Impôt → Revenu: Yearly or monthly menu
   yearlyOptionReverseBtn.addEventListener("click", () => {
-    yearlyOptionReverseBtn.classList.add("active");
-    monthlyOptionReverseBtn.classList.remove("active");
-    const isTaxPercentageMode = taxPercentageBtn.classList.contains("active");
-    const useAbattement = abattementReverseBtn.classList.contains("active");
-    const isYearly = true;
-    calculateAndFormatImpotToRevenu(
-      taxPercentageInput.value, taxAmountInput.value, fixedChargesReverseInput.value,
-      isTaxPercentageMode, useAbattement, isYearly, yearSelect.value, calculatedRevenuElement
-    );
+    activateButton([yearlyOptionReverseBtn, monthlyOptionReverseBtn], yearlyOptionReverseBtn);
+    recalculateImpotToRevenu();
   });
 
   monthlyOptionReverseBtn.addEventListener("click", () => {
-    monthlyOptionReverseBtn.classList.add("active");
-    yearlyOptionReverseBtn.classList.remove("active");
-    const isTaxPercentageMode = taxPercentageBtn.classList.contains("active");
-    const useAbattement = abattementReverseBtn.classList.contains("active");
-    const isYearly = false;
-    calculateAndFormatImpotToRevenu(
-      taxPercentageInput.value, taxAmountInput.value, fixedChargesReverseInput.value,
-      isTaxPercentageMode, useAbattement, isYearly, yearSelect.value, calculatedRevenuElement
-    );
+    activateButton([yearlyOptionReverseBtn, monthlyOptionReverseBtn], monthlyOptionReverseBtn);
+    recalculateImpotToRevenu();
   });
 
   // Impôt → Revenu: Percentage or value menu
@@ -181,145 +153,51 @@ document.addEventListener("DOMContentLoaded", async () => {
     taxPercentageGroup.style.display = "block";
     taxAmountGroup.style.display = "none";
     taxTypeGroup.classList.add("hidden");
-    taxPercentageBtn.classList.add("active");
-    taxAmountBtn.classList.remove("active");
-    const isTaxPercentageMode = true;
-    const useAbattement = abattementReverseBtn.classList.contains("active");
-    const isYearly = yearlyOptionReverseBtn.classList.contains("active");
-    calculateAndFormatImpotToRevenu(
-      taxPercentageInput.value, taxAmountInput.value, fixedChargesReverseInput.value,
-      isTaxPercentageMode, useAbattement, isYearly, yearSelect.value, calculatedRevenuElement
-    );
+    activateButton([taxPercentageBtn, taxAmountBtn], taxPercentageBtn);
+    recalculateImpotToRevenu();
   });
 
   taxAmountBtn.addEventListener("click", () => {
     taxAmountGroup.style.display = "block";
     taxPercentageGroup.style.display = "none";
     taxTypeGroup.classList.remove("hidden");
-    taxAmountBtn.classList.add("active");
-    taxPercentageBtn.classList.remove("active");
-    const isTaxPercentageMode = false;
-    const useAbattement = abattementReverseBtn.classList.contains("active");
-    const isYearly = yearlyOptionReverseBtn.classList.contains("active");
-    calculateAndFormatImpotToRevenu(
-      taxPercentageInput.value, taxAmountInput.value, fixedChargesReverseInput.value,
-      isTaxPercentageMode, useAbattement, isYearly, yearSelect.value, calculatedRevenuElement
-    );
+    activateButton([taxPercentageBtn, taxAmountBtn], taxAmountBtn);
+    recalculateImpotToRevenu();
   });
 
   // Impôt → Revenu: 10% or charges menu
   abattementReverseBtn.addEventListener("click", () => {
     fixedChargesGroupReverse.style.display = "none";
-    abattementReverseBtn.classList.add("active");
-    fixedChargesReverseBtn.classList.remove("active");
-    const isTaxPercentageMode = taxPercentageBtn.classList.contains("active");
-    const useAbattement = true;
-    const isYearly = yearlyOptionReverseBtn.classList.contains("active");
-    calculateAndFormatImpotToRevenu(
-      taxPercentageInput.value, taxAmountInput.value, fixedChargesReverseInput.value,
-      isTaxPercentageMode, useAbattement, isYearly, yearSelect.value, calculatedRevenuElement
-    );
+    activateButton([abattementReverseBtn, fixedChargesReverseBtn], abattementReverseBtn);
+    recalculateImpotToRevenu();
   });
 
   fixedChargesReverseBtn.addEventListener("click", () => {
     fixedChargesGroupReverse.style.display = "block";
-    fixedChargesReverseBtn.classList.add("active");
-    abattementReverseBtn.classList.remove("active");
-    const isTaxPercentageMode = taxPercentageBtn.classList.contains("active");
-    const useAbattement = false;
-    const isYearly = yearlyOptionReverseBtn.classList.contains("active");
-    calculateAndFormatImpotToRevenu(
-      taxPercentageInput.value, taxAmountInput.value, fixedChargesReverseInput.value,
-      isTaxPercentageMode, useAbattement, isYearly, yearSelect.value, calculatedRevenuElement
-    );
+    activateButton([abattementReverseBtn, fixedChargesReverseBtn], fixedChargesReverseBtn);
+    recalculateImpotToRevenu();
   });
 
   // Add event listeners for input changes
-  revenuInput.addEventListener("input", () => {
-    const isYearly = yearlyOptionBtn.classList.contains("active");
-    const useAbattement = abattementBtn.classList.contains("active");
-    calculateAndFormatRevenuToImpot(
-      revenuInput.value, fixedChargesInput.value, isYearly, useAbattement, yearSelect.value,
-      taxPercentageElement, thresholdBreakdownElement, totalTaxElement, missingMoneyElement
-    );
+  [revenuInput, fixedChargesInput].forEach(input => {
+    input.addEventListener("input", recalculateRevenuToImpot);
   });
-  
-  fixedChargesInput.addEventListener("input", () => {
-    const isYearly = yearlyOptionBtn.classList.contains("active");
-    const useAbattement = abattementBtn.classList.contains("active");
-    calculateAndFormatRevenuToImpot(
-      revenuInput.value, fixedChargesInput.value, isYearly, useAbattement, yearSelect.value,
-      taxPercentageElement, thresholdBreakdownElement, totalTaxElement, missingMoneyElement
-    );
+
+  [taxPercentageInput, taxAmountInput, fixedChargesReverseInput].forEach(input => {
+    input.addEventListener("input", recalculateImpotToRevenu);
   });
-  
-  taxPercentageInput.addEventListener("input", () => {
-    const isTaxPercentageMode = taxPercentageBtn.classList.contains("active");
-    const useAbattement = abattementReverseBtn.classList.contains("active");
-    const isYearly = yearlyOptionReverseBtn.classList.contains("active");
-    calculateAndFormatImpotToRevenu(
-      taxPercentageInput.value, taxAmountInput.value, fixedChargesReverseInput.value,
-      isTaxPercentageMode, useAbattement, isYearly, yearSelect.value, calculatedRevenuElement
-    );
-  });
-  
-  taxAmountInput.addEventListener("input", () => {
-    const isTaxPercentageMode = taxPercentageBtn.classList.contains("active");
-    const useAbattement = abattementReverseBtn.classList.contains("active");
-    const isYearly = yearlyOptionReverseBtn.classList.contains("active");
-    calculateAndFormatImpotToRevenu(
-      taxPercentageInput.value, taxAmountInput.value, fixedChargesReverseInput.value,
-      isTaxPercentageMode, useAbattement, isYearly, yearSelect.value, calculatedRevenuElement
-    );
-  });
-  
-  fixedChargesReverseInput.addEventListener("input", () => {
-    const isTaxPercentageMode = taxPercentageBtn.classList.contains("active");
-    const useAbattement = abattementReverseBtn.classList.contains("active");
-    const isYearly = yearlyOptionReverseBtn.classList.contains("active");
-    calculateAndFormatImpotToRevenu(
-      taxPercentageInput.value, taxAmountInput.value, fixedChargesReverseInput.value,
-      isTaxPercentageMode, useAbattement, isYearly, yearSelect.value, calculatedRevenuElement
-    );
-  });
-  
+
+  // Recalculate both sections when the tax year changes
   yearSelect.addEventListener("change", () => {
-    const isYearly = yearlyOptionBtn.classList.contains("active");
-    const useAbattement = abattementBtn.classList.contains("active");
-    calculateAndFormatRevenuToImpot(
-      revenuInput.value, fixedChargesInput.value, isYearly, useAbattement, yearSelect.value,
-      taxPercentageElement, thresholdBreakdownElement, totalTaxElement, missingMoneyElement
-    );
-    
-    const isTaxPercentageMode = taxPercentageBtn.classList.contains("active");
-    const useAbattementReverse = abattementReverseBtn.classList.contains("active");
-    const isYearlyReverse = yearlyOptionReverseBtn.classList.contains("active");
-    calculateAndFormatImpotToRevenu(
-      taxPercentageInput.value, taxAmountInput.value, fixedChargesReverseInput.value,
-      isTaxPercentageMode, useAbattementReverse, isYearlyReverse, yearSelect.value, calculatedRevenuElement
-    );
+    recalculateRevenuToImpot();
+    recalculateImpotToRevenu();
   });
 
   // Register functions with translation system
   if (window.translationSystem) {
     window.translationSystem.registerCalculationFunctions(
-      () => {
-        const isYearly = yearlyOptionBtn.classList.contains("active");
-        const useAbattement = abattementBtn.classList.contains("active");
-        calculateAndFormatRevenuToImpot(
-          revenuInput.value, fixedChargesInput.value, isYearly, useAbattement, yearSelect.value,
-          taxPercentageElement, thresholdBreakdownElement, totalTaxElement, missingMoneyElement
-        );
-      },
-      () => {
-        const isTaxPercentageMode = taxPercentageBtn.classList.contains("active");
-        const useAbattement = abattementReverseBtn.classList.contains("active");
-        const isYearly = yearlyOptionReverseBtn.classList.contains("active");
-        calculateAndFormatImpotToRevenu(
-          taxPercentageInput.value, taxAmountInput.value, fixedChargesReverseInput.value,
-          isTaxPercentageMode, useAbattement, isYearly, yearSelect.value, calculatedRevenuElement
-        );
-      }
+      recalculateRevenuToImpot,
+      recalculateImpotToRevenu
     );
   }
 });

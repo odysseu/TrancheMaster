@@ -261,8 +261,10 @@ input:checked+.slider:before {
 
 /* Input and button styles */
 .input-group {
+    display: block;
     position: relative;
     margin-bottom: 15px;
+    cursor: text;
 }
 
 .input-group .floating-placeholder {
